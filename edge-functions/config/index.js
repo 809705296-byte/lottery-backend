@@ -63,18 +63,16 @@ export async function onRequest(context) {
         method: 'PATCH',
         headers,
         body: JSON.stringify({
-          data: {
-            totalUsers: body.totalUsers,
-            prizes: body.prizes,
-            boxes: body.boxes || []
-          },
-          updated_at: new Date().toISOString()
-        })
-      });
-      return new Response(JSON.stringify({ ok: true }), {
-        headers: { ...corsHeaders, 'content-type': 'application/json' }
-      });
-    }
+  data: {
+    totalUsers: body.totalUsers,
+    prizes: body.prizes,
+    boxes: body.boxes || [],
+    salesId: body.salesId,
+    salesQRImage: body.salesQRImage,
+    rule: body.rule
+  },
+  updated_at: new Date().toISOString()
+})
 
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
