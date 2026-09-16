@@ -28,7 +28,7 @@ export async function onRequest(context) {
 
   try {
     const body = await request.json();
-    const { fingerprint } = body;
+    const { fingerprint, boxIndex } = body;
 
     if (!fingerprint) {
       return new Response(JSON.stringify({ error: '缺少参数' }), {
@@ -62,6 +62,7 @@ export async function onRequest(context) {
     const cfg = cfgRows[0].data;
     const totalUsers = Number(cfg.totalUsers) || 1000;
     const prizes = Array.isArray(cfg.prizes) ? cfg.prizes : [];
+    const boxes = Array.isArray(cfg.boxes) ? cfg.boxes : [];
 
     // 3. 统计已中奖数量
     const recRes = await fetch(url + '/rest/v1/records?select=prize', { headers });
@@ -97,13 +98,15 @@ export async function onRequest(context) {
       if (!prize) prize = pool[pool.length - 1];
     }
 
-    // 6. 写记录（中奖和谢谢参与都记录）
+    // 6. 写记录（带上盲盒名字）
+    const boxName = (boxIndex !== undefined && boxes[boxIndex]) ? boxes[boxIndex].name : '盲盒';
     await fetch(url + '/rest/v1/records', {
       method: 'POST',
       headers,
       body: JSON.stringify({
         fingerprint: fingerprint,
         time: new Date().toLocaleString('zh-CN'),
+        box: boxName,
         prize: prize.name,
         emoji: prize.emoji || '🎁',
         image: prize.image || '',
