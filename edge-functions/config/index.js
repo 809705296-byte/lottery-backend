@@ -1,6 +1,18 @@
 export async function onRequest(context) {
+  const { request, env } = context;
+
+  if (request.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      }
+    });
+  }
+
   try {
-    const { env } = context;
     const url = env.SUPABASE_URL;
     const key = env.SUPABASE_KEY;
 
