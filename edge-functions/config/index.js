@@ -4,29 +4,17 @@ export async function onRequest(context) {
     const url = env.SUPABASE_URL;
     const key = env.SUPABASE_KEY;
 
-    if (!url || !key) {
-      return new Response(JSON.stringify({
-        error: '环境变量未读取到',
-        hasUrl: !!url,
-        hasKey: !!key
-      }), {
-        headers: { 'content-type': 'application/json' }
-      });
-    }
-
     const res = await fetch(url + '/rest/v1/config?id=eq.main&select=data', {
       headers: {
         'apikey': key,
         'Authorization': 'Bearer ' + key
       }
     });
-
-    const text = await res.text();
+    const rows = await res.json();
 
     return new Response(JSON.stringify({
       ok: true,
-      status: res.status,
-      raw: text
+      config: rows[0]?.data || { boxes: [] }
     }), {
       headers: {
         'content-type': 'application/json',
@@ -34,10 +22,8 @@ export async function onRequest(context) {
       }
     });
   } catch (err) {
-    return new Response(JSON.stringify({
-      error: String(err),
-      stack: err.stack || ''
-    }), {
+    return new Response(JSON.stringify({ error: String(err) }), {
+      status: 500,
       headers: { 'content-type': 'application/json' }
     });
   }
