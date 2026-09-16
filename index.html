@@ -999,14 +999,36 @@
   }
 
   function saveBaseConfig() {
-    CFG.salesId = ($('cfgSalesId').value || '').trim() || 'sales_test';
-    CFG.password = ($('cfgPwd').value || '').trim() || 'akd123456';
-    CFG.rule = ($('cfgRule').value || '').trim() || CFG.rule;
-    saveLocalCfg({ salesId: CFG.salesId, password: CFG.password, rule: CFG.rule });
-    renderSalesQR();
-    $('ruleText').innerHTML = CFG.rule;
-    showToast('基础设置已保存（本机）');
-  }
+  CFG.salesId = ($('cfgSalesId').value || '').trim() || 'sales_test';
+  CFG.password = ($('cfgPwd').value || '').trim() || 'akd123456';
+  CFG.rule = ($('cfgRule').value || '').trim() || CFG.rule;
+
+  fetch(API_BASE + '/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      totalUsers: CFG.totalUsers || 500,
+      prizes: CFG.prizes || [],
+      boxes: CFG.boxes || [],
+      salesId: CFG.salesId,
+      salesQRImage: CFG.salesQRImage || '',
+      rule: CFG.rule
+    })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.ok) {
+      showToast('基础设置已保存到服务器');
+    } else {
+      showToast('保存失败');
+    }
+  })
+  ['catch'](function() { showToast('网络错误'); });
+
+  $('salesIdDisplay').textContent = CFG.salesId;
+  renderSalesQR();
+  $('ruleText').innerHTML = CFG.rule;
+}
 
   function loadRecordsFromServer() {
     fetch(API_BASE + '/records')
@@ -1151,14 +1173,21 @@ function clearRecordsFromServer() {
     $('myDeviceId').textContent = DEVICE_ID;
 
     // 从服务器读奖品配置
-    fetch(API_BASE + '/config')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      if (data.ok && data.config) {
-        CFG.totalUsers = data.config.totalUsers || 1000;
-        CFG.prizes = data.config.prizes || [];
-      }
-    })['catch'](function() {});
+ fetch(API_BASE + '/config')
+.then(function(res) { return res.json(); })
+.then(function(data) {
+  if (data.ok && data.config) {
+    CFG.totalUsers = data.config.totalUsers || 1000;
+    CFG.prizes = data.config.prizes || [];
+    CFG.boxes = data.config.boxes || [];
+    if (data.config.salesId) CFG.salesId = data.config.salesId;
+    if (data.config.salesQRImage) CFG.salesQRImage = data.config.salesQRImage;
+    if (data.config.rule) CFG.rule = data.config.rule;
+    $('salesIdDisplay').textContent = CFG.salesId;
+    renderSalesQR();
+    $('ruleText').innerHTML = CFG.rule;
+  }
+})['catch'](function() {});
 
     if (ME) {
       $('stepsBar').hidden = true;
