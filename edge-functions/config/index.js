@@ -62,7 +62,7 @@ export async function onRequest(context) {
       await fetch(url + '/rest/v1/config?id=eq.main', {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({
+      body: JSON.stringify({
   data: {
     totalUsers: body.totalUsers,
     prizes: body.prizes,
