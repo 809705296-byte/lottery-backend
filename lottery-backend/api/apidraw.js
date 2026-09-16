@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 
-const sql = neon('这里粘贴你的完整连接字符串');;
+const sql = neon('这里粘贴你的完整连接字符串');
 
 export default async function handler(req, res) {
   // 允许跨域（前端在不同域名调用）
