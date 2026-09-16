@@ -13,6 +13,19 @@ export async function onRequest(context) {
 
   const url = env.SUPABASE_URL;
   const key = env.SUPABASE_KEY;
+
+  // 环境变量缺失时直接报错，不掩盖问题
+  if (!url || !key) {
+    return new Response(JSON.stringify({
+      error: '环境变量未配置',
+      hasUrl: !!url,
+      hasKey: !!key
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'content-type': 'application/json' }
+    });
+  }
+
   const headers = {
     'apikey': key,
     'Authorization': 'Bearer ' + key,
@@ -24,31 +37,40 @@ export async function onRequest(context) {
     if (request.method === 'GET') {
       const res = await fetch(url + '/rest/v1/config?id=eq.main&select=data', { headers });
       const rows = await res.json();
-      return new Response(JSON.stringify({
-        ok: true,
-        config: rows[0]?.data || { totalUsers: 1000, prizes: [] }
-      }), { headers: { ...corsHeaders, 'content-type': 'application/json' } });
-    }
 
-    // POST：保存配置（后台用）
-    if (request.method === 'POST') {
-      const body = await request.json();
-      if (!body.totalUsers || !Array.isArray(body.prizes)) {
-        return new Response(JSON.stringify({ error: '格式错误' }), {
-          status: 400,
+      if (!rows.length) {
+        return new Response(JSON.stringify({
+          error: '数据库里没有 main 记录',
+          raw: rows
+        }), {
+          status: 500,
           headers: { ...corsHeaders, 'content-type': 'application/json' }
         });
       }
 
+      return new Response(JSON.stringify({
+        ok: true,
+        config: rows[0].data
+      }), {
+        headers: { ...corsHeaders, 'content-type': 'application/json' }
+      });
+    }
+
+    // POST：保存配置
+    if (request.method === 'POST') {
+      const body = await request.json();
       await fetch(url + '/rest/v1/config?id=eq.main', {
         method: 'PATCH',
         headers,
         body: JSON.stringify({
-          data: { totalUsers: body.totalUsers, prizes: body.prizes },
+          data: {
+            totalUsers: body.totalUsers,
+            prizes: body.prizes,
+            boxes: body.boxes || []
+          },
           updated_at: new Date().toISOString()
         })
       });
-
       return new Response(JSON.stringify({ ok: true }), {
         headers: { ...corsHeaders, 'content-type': 'application/json' }
       });
