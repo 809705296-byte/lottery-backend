@@ -1196,15 +1196,37 @@
   }
 
   function saveBaseConfig() {
-    CFG.salesId = ($('cfgSalesId').value || '').trim() || DEFAULTS.salesId;
-    CFG.password = ($('cfgPwd').value || '').trim() || DEFAULTS.password;
-    CFG.rule = ($('cfgRule').value || '').trim() || DEFAULTS.rule;
-    saveLocalCfg({ salesId: CFG.salesId, password: CFG.password, rule: CFG.rule });
-    $('salesIdDisplay').textContent = CFG.salesId;
-    renderSalesQR();
-    $('ruleText').innerHTML = CFG.rule;
-    showToast('基础设置已保存（仅本机生效）');
-  }
+  CFG.salesId = ($('cfgSalesId').value || '').trim() || DEFAULTS.salesId;
+  CFG.password = ($('cfgPwd').value || '').trim() || DEFAULTS.password;
+  CFG.rule = ($('cfgRule').value || '').trim() || DEFAULTS.rule;
+
+  // 存到服务器
+  fetch(API_BASE + '/config', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      totalUsers: CFG.totalUsers || 500,
+      prizes: CFG.prizes || [],
+      boxes: CFG.boxes || [],
+      salesId: CFG.salesId,
+      salesQRImage: CFG.salesQRImage || '',
+      rule: CFG.rule
+    })
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.ok) {
+      showToast('基础设置已保存到服务器');
+    } else {
+      showToast('保存失败');
+    }
+  })
+  ['catch'](function() { showToast('网络错误'); });
+
+  $('salesIdDisplay').textContent = CFG.salesId;
+  renderSalesQR();
+  $('ruleText').innerHTML = CFG.rule;
+}
 
   // 后台改完基础设置后，用这里导出可以直接粘进源码 DEFAULTS 的代码
   function jsStr(s) {
@@ -1429,10 +1451,13 @@
     .then(function(res) { return res.json(); })
     .then(function(data) {
       if (data.ok && data.config) {
-        CFG.totalUsers = data.config.totalUsers || 1000;
-        CFG.prizes = data.config.prizes || [];
-      }
-    })['catch'](function() {});
+  CFG.totalUsers = data.config.totalUsers || 1000;
+  CFG.prizes = data.config.prizes || [];
+  CFG.boxes = data.config.boxes || [];
+  if (data.config.salesId) CFG.salesId = data.config.salesId;
+  if (data.config.salesQRImage) CFG.salesQRImage = data.config.salesQRImage;
+  if (data.config.rule) CFG.rule = data.config.rule;
+}
 
     if (ME) {
       $('stepsBar').hidden = true;
