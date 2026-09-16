@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "directory": "edge-functions"
+    "runtime": "nodejs18"
+  }
+}
