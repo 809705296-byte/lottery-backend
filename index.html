@@ -1034,7 +1034,91 @@
     })
     ['catch'](function() { showToast('读取名单失败'); });
   }
+function exportExcel() {
+  fetch(API_BASE + '/records')
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    var rec = data.records || [];
+    if (!rec.length) { showToast('暂无记录'); return; }
 
+    var html = '<html><head><meta charset="UTF-8"><style>' +
+      'td,th{padding:6px 12px;border:1px solid #ccc;font-size:13px}' +
+      'th{background:#ffd700;color:#1a1025;font-weight:bold}' +
+      '</style></head><body><table>';
+    html += '<tr><th>序号</th><th>时间</th><th>盲盒</th><th>奖品</th><th>核销状态</th></tr>';
+    for (var i = 0; i < rec.length; i++) {
+      var r = rec[i];
+      html += '<tr>' +
+        '<td>' + (i+1) + '</td>' +
+        '<td>' + (r.time || '') + '</td>' +
+        '<td>' + (r.box || '') + '</td>' +
+        '<td>' + (r.prize || '') + '</td>' +
+        '<td>' + (r.verified ? '已核销' : '未核销') + '</td>' +
+      '</tr>';
+    }
+    html += '</table></body></html>';
+
+    var blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '抽奖名单_' + new Date().toISOString().slice(0,10) + '.xls';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 1000);
+    showToast('已触发下载');
+  });
+}
+
+function exportCSV() {
+  fetch(API_BASE + '/records')
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    var rec = data.records || [];
+    if (!rec.length) { showToast('暂无记录'); return; }
+    var rows = [['序号','时间','盲盒','奖品','核销状态']];
+    for (var i = 0; i < rec.length; i++) {
+      var r = rec[i];
+      rows.push([i+1, r.time || '', r.box || '', r.prize || '', r.verified ? '已核销' : '未核销']);
+    }
+    var csv = rows.map(function(row) {
+      return row.map(function(f) { return '"' + String(f).replace(/"/g,'""') + '"'; }).join(',');
+    }).join('\n');
+
+    var ta = $('csvOut');
+    ta.value = csv;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(csv).then(function() {
+        showToast('CSV 已复制到剪贴板');
+      })['catch'](function() {
+        showToast('已生成，请手动复制下方文本');
+      });
+    } else {
+      ta.select();
+      try { document.execCommand('copy'); showToast('已复制'); } catch(e) {}
+    }
+  });
+}
+
+function clearRecordsFromServer() {
+  if (!confirm('确定清空所有记录？不可恢复')) return;
+  fetch(API_BASE + '/records', {
+    method: 'DELETE'
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.ok) {
+      showToast('已清空');
+      loadRecordsFromServer();
+    } else {
+      showToast('清空失败');
+    }
+  })
+  ['catch'](function() { showToast('网络错误'); });
+}
   function onQRFileChange(e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
@@ -1109,6 +1193,10 @@
     };
     $('savePrizesBtn').onclick = savePrizesConfig;
     $('refreshRecBtn').onclick = loadRecordsFromServer;
+   $('exportExcelBtn').onclick = exportExcel;
+$('exportCSVBtn').onclick = exportCSV;
+$('clearRecBtn').onclick = clearRecordsFromServer;
+   
     $('resetMeBtn').onclick = function() {
       if (!confirm('重置后本机可再抽一次，确定？')) return;
       localStorage.removeItem(KEY_ME);
