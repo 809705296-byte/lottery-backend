@@ -1,7 +1,6 @@
 export async function onRequest(context) {
   const { request, env } = context;
-  
-  // 只允许 POST
+
   if (request.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
@@ -12,7 +11,7 @@ export async function onRequest(context) {
   try {
     const body = await request.json();
     const { fingerprint, boxIndex } = body;
-    
+
     if (!fingerprint || boxIndex === undefined) {
       return new Response(JSON.stringify({ error: '缺少参数' }), {
         status: 400,
@@ -20,19 +19,29 @@ export async function onRequest(context) {
       });
     }
 
-    const { neon } = await import('https://esm.sh/@neondatabase/serverless@0.9.0');
-    const sql = neon(env.DATABASE_URL);
+    const url = env.SUPABASE_URL;
+    const key = env.SUPABASE_KEY;
+    const headers = {
+      'apikey': key,
+      'Authorization': 'Bearer ' + key,
+      'Content-Type': 'application/json'
+    };
 
     // 1. 一人一次
-    const existing = await sql`SELECT * FROM records WHERE fingerprint = ${fingerprint} LIMIT 1`;
-    if (existing.length > 0) {
-      return new Response(JSON.stringify({ ok: false, msg: '您已参与过', prize: existing[0].prize }), {
+    const existRes = await fetch(
+      url + '/rest/v1/records?fingerprint=eq.' + encodeURIComponent(fingerprint) + '&limit=1',
+      { headers }
+    );
+    const exist = await existRes.json();
+    if (exist.length > 0) {
+      return new Response(JSON.stringify({ ok: false, msg: '您已参与过', prize: exist[0].prize }), {
         headers: { 'content-type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
 
     // 2. 读配置
-    const cfgRows = await sql`SELECT data FROM config WHERE id = 'main'`;
+    const cfgRes = await fetch(url + '/rest/v1/config?id=eq.main&select=data', { headers });
+    const cfgRows = await cfgRes.json();
     if (!cfgRows.length) {
       return new Response(JSON.stringify({ error: '配置未初始化' }), {
         status: 500,
@@ -64,13 +73,25 @@ export async function onRequest(context) {
       return b;
     });
 
-    await sql`UPDATE config SET data = ${JSON.stringify({ boxes: newBoxes })} WHERE id = 'main'`;
+    await fetch(url + '/rest/v1/config?id=eq.main', {
+      method: 'PATCH',
+      headers,
+      body: JSON.stringify({ data: { boxes: newBoxes } })
+    });
 
     // 5. 写记录
-    await sql`
-      INSERT INTO records (fingerprint, time, box, prize, emoji, desc_text)
-      VALUES (${fingerprint}, ${new Date().toLocaleString('zh-CN')}, ${box.name}, ${prize.name}, ${prize.emoji || '🎁'}, ${prize.desc || ''})
-    `;
+    await fetch(url + '/rest/v1/records', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        fingerprint: fingerprint,
+        time: new Date().toLocaleString('zh-CN'),
+        box: box.name,
+        prize: prize.name,
+        emoji: prize.emoji || '🎁',
+        desc_text: prize.desc || ''
+      })
+    });
 
     return new Response(JSON.stringify({ ok: true, prize }), {
       headers: { 'content-type': 'application/json', 'Access-Control-Allow-Origin': '*' }
