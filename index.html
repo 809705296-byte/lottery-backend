@@ -460,11 +460,15 @@
     <button class="btn" id="savePrizesBtn">保存奖品配置</button>
   </section>
 
-  <section>
-    <h3>参与者名单（<span id="recCount">0</span> 人）</h3>
-    <div id="recordList"></div>
-    <button class="btn btn-sec" id="refreshRecBtn">刷新名单</button>
-  </section>
+<section>
+  <h3>参与者名单（<span id="recCount">0</span> 人）</h3>
+  <div id="recordList"></div>
+  <button class="btn btn-sec" id="refreshRecBtn">刷新名单</button>
+  <button class="btn" id="exportExcelBtn">📥 下载 Excel 名单</button>
+  <button class="btn btn-sec" id="exportCSVBtn">复制为 CSV</button>
+  <button class="btn btn-danger" id="clearRecBtn">清空所有记录</button>
+  <textarea id="csvOut" readonly placeholder="备用文本区" style="font-size:11px;height:80px;margin-top:8px"></textarea>
+</section>
 
   <section>
     <h3>本机测试</h3>
