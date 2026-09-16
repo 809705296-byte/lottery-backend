@@ -1,12 +1,16 @@
 export async function onRequest(context) {
   const { env } = context;
-  const dbUrl = env.DATABASE_URL;
-  
-  // 从数据库读配置
-  const { neon } = await import('https://esm.sh/@neondatabase/serverless@0.9.0');
-  const sql = neon(dbUrl);
-  const rows = await sql`SELECT data FROM config WHERE id = 'main'`;
-  
+  const url = env.SUPABASE_URL;
+  const key = env.SUPABASE_KEY;
+
+  const res = await fetch(url + '/rest/v1/config?id=eq.main&select=data', {
+    headers: {
+      'apikey': key,
+      'Authorization': 'Bearer ' + key
+    }
+  });
+  const rows = await res.json();
+
   return new Response(JSON.stringify({
     ok: true,
     config: rows[0]?.data || { boxes: [] }
