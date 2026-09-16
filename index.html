@@ -770,7 +770,7 @@
     fetch(API_BASE + '/draw', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fingerprint: DEVICE_ID })
+     body: JSON.stringify({ fingerprint: DEVICE_ID, boxIndex: idx })
     })
     .then(function(res) { return res.json(); })
     .then(function(data) {
