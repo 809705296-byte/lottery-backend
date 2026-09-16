@@ -99,21 +99,32 @@ export async function onRequest(context) {
     }
 
     // 6. 写记录（带上盲盒名字）
-    const boxName = (boxIndex !== undefined && boxes[boxIndex]) ? boxes[boxIndex].name : '盲盒';
-    await fetch(url + '/rest/v1/records', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        fingerprint: fingerprint,
-        time: new Date().toLocaleString('zh-CN'),
-        box: boxName,
-        prize: prize.name,
-        emoji: prize.emoji || '🎁',
-        image: prize.image || '',
-        verified: false,
-        verified_time: null
-      })
-    });
+const boxName = (boxIndex !== undefined && boxes[boxIndex]) ? boxes[boxIndex].name : '盲盒';
+const writeRes = await fetch(url + '/rest/v1/records', {
+  method: 'POST',
+  headers,
+  body: JSON.stringify({
+    fingerprint: fingerprint,
+    time: new Date().toLocaleString('zh-CN'),
+    box: boxName,
+    prize: prize.name,
+    emoji: prize.emoji || '🎁',
+    image: prize.image || '',
+    verified: false,
+    verified_time: null
+  })
+});
+const writeText = await writeRes.text();
+if (!writeRes.ok) {
+  return new Response(JSON.stringify({
+    error: '写记录失败',
+    status: writeRes.status,
+    detail: writeText
+  }), {
+    status: 500,
+    headers: { ...corsHeaders, 'content-type': 'application/json' }
+  });
+}
 
     return new Response(JSON.stringify({ ok: true, prize }), {
       headers: { ...corsHeaders, 'content-type': 'application/json' }
