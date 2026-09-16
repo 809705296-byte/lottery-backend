@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>拆盲盒 · 赢好礼</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", sans-serif;
+    background: #1a1025;
+    background: -webkit-linear-gradient(top, #2d1b3d, #0f0a1a);
+    background: linear-gradient(180deg, #2d1b3d 0%, #0f0a1a 70%);
+    background-attachment: fixed;
+    color: #fff; min-height: 100vh;
+    padding: 16px 16px 32px;
+    font-size: 15px;
+    -webkit-text-size-adjust: 100%;
+  }
+  .app { max-width: 420px; margin: 0 auto; }
+
+  .hero { text-align: center; margin-bottom: 20px; }
+  .hero h1 {
+    font-size: 26px; font-weight: 800;
+    color: #ffd700;
+    letter-spacing: 2px;
+    cursor: pointer;
+  }
+  .hero p { color: #bbaacc; font-size: 13px; margin-top: 6px; }
+
+  .stage {
+    background: rgba(255,255,255,0.06);
+    border-radius: 18px;
+    padding: 20px 14px;
+    border: 1px solid rgba(255,215,0,0.25);
+  }
+  .steps { display: flex; justify-content: space-around; margin-bottom: 22px; }
+  .step { text-align: center; opacity: 0.35; transition: opacity 0.3s; flex: 1; }
+  .step.active { opacity: 1; }
+  .step i {
+    display: block; width: 28px; height: 28px; line-height: 28px;
+    border-radius: 50%; background: #ffd700; color: #1a1025;
+    font-weight: bold; margin: 0 auto 4px; font-style: normal; font-size: 13px;
+  }
+  .step span { font-size: 11px; color: #ccbbdd; }
+
+  .panel { text-align: center; }
+  .qr-wrap {
+    width: 190px; height: 190px; margin: 0 auto 12px;
+    background: #fff; border-radius: 12px; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .qr-wrap img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .hint { font-size: 14px; color: #bbaacc; margin-bottom: 16px; line-height: 1.5; }
+  .hint b { color: #ffd700; }
+
+  .code-input-wrap { margin-bottom: 14px; }
+  .code-input {
+    width: 100%; background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,215,0,0.5);
+    border-radius: 10px; color: #fff; padding: 12px;
+    font-size: 16px; text-align: center; font-family: inherit;
+    letter-spacing: 2px;
+  }
+  .code-input:focus { outline: none; border-color: #ffd700; }
+  .code-tip {
+    font-size: 12px; color: #ff9f43; margin-top: 6px;
+  }
+
+  .btn {
+    display: block; width: 100%; border: none;
+    background: #ffd700;
+    background: -webkit-linear-gradient(left top, #ffd700, #ffaa00);
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    color: #1a1025; font-weight: 700; font-size: 17px;
+    padding: 14px; border-radius: 50px;
+    box-shadow: 0 4px 14px rgba(255,215,0,0.3);
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn:disabled { opacity: 0.5; }
+  .btn-sec {
+    background: rgba(255,215,0,0.12) !important;
+    border: 1px solid #ffd700 !important;
+    color: #ffd700 !important;
+    box-shadow: none !important;
+  }
+  .btn-danger {
+    background: rgba(255,80,80,0.15) !important;
+    border: 1px solid #ff5050 !important;
+    color: #ff5050 !important;
+    box-shadow: none !important;
+  }
+  .btn-mini {
+    background: rgba(255,215,0,0.2); border: 1px solid #ffd700;
+    color: #ffd700; padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; cursor: pointer; margin-left: 6px;
+    font-family: inherit;
+  }
+
+  .copy-row {
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px; margin-bottom: 16px; font-size: 14px; color: #ddccff;
+  }
+  .copy-row b { color: #ffd700; }
+
+  .box-grid {
+    display: flex; flex-wrap: wrap;
+    margin: 10px -6px 0;
+  }
+  .box-item {
+    position: relative;
+    width: 50%;
+    padding: 0 6px 12px;
+    cursor: pointer;
+  }
+  .box-inner {
+    width: 100%;
+    height: 0;
+    padding-bottom: 100%;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .box-inner .bi-content {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 10px;
+  }
+  .box-inner.has-image .bi-content {
+    background: rgba(0,0,0,0.35);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+  }
+  .box-item:active .box-inner { transform: scale(0.95); }
+  .box-item.shaking .box-inner { animation: shake 0.5s ease-in-out 2; }
+  .box-inner .bi-emoji { font-size: 44px; line-height: 1; }
+  .box-inner .bi-label { margin-top: 6px; font-size: 13px; font-weight: 600; }
+
+  @keyframes shake {
+    0%,100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+  }
+
+  .open-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.88);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 150;
+  }
+  .open-box {
+    width: 60vw; max-width: 220px; height: 60vw; max-height: 220px;
+    border-radius: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 70px;
+    box-shadow: 0 0 40px rgba(255,215,0,0.4);
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+  }
+  .open-box img { max-width: 80%; max-height: 80%; border-radius: 10px; }
+  .open-box.opened { animation: pop 0.5s ease-out forwards; }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1.1); }
+  }
+
+  .prize-card {
+    background: rgba(255,255,255,0.06);
+    border-radius: 16px;
+    padding: 20px 16px;
+    border: 1px solid rgba(255,215,0,0.3);
+    margin-bottom: 16px;
+  }
+  .prize-card .pc-emoji {
+    font-size: 70px; line-height: 1; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 80px;
+  }
+  .prize-card .pc-emoji img {
+    max-width: 100%; max-height: 180px; border-radius: 10px;
+  }
+  .prize-card .pc-name { font-size: 20px; color: #ffd700; font-weight: 700; margin-bottom: 6px; }
+  .prize-card .pc-desc { font-size: 13px; color: #bbaacc; margin-bottom: 10px; }
+  .prize-card .pc-time { font-size: 12px; color: #887799; }
+  .prize-card .pc-box { font-size: 12px; color: #887799; margin-top: 4px; }
+
+  .verify-area { margin-top: 10px; }
+  .verify-slider {
+    position: relative;
+    height: 52px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,215,0,0.4);
+    border-radius: 26px;
+    overflow: hidden;
+    margin: 0 0 8px;
+  }
+  .vs-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 52px;
+    background: -webkit-linear-gradient(left top, #ffd700, #ffaa00);
+    background: linear-gradient(135deg, #ffd700, #ffaa00);
+    border-radius: 26px;
+    pointer-events: none;
+  }
+  .vs-label {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #ccbbdd; letter-spacing: 2px;
+    pointer-events: none;
+  }
+  .vs-thumb {
+    position: absolute;
+    left: 4px; top: 4px;
+    width: 44px; height: 44px;
+    background: -webkit-linear-gradient(left top, #fff, #ffd700);
+    background: linear-gradient(135deg, #fff, #ffd700);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #1a1025; font-weight: bold;
+    box-shadow: 0 2px 8px rgba(255,215,0,0.5);
+    cursor: grab;
+  }
+  .vs-thumb.done { background: #10b981; color: #fff; }
+  .verify-tip { font-size: 11px; color: #887799; line-height: 1.5; }
+  .verify-tip b { color: #ff9f43; }
+
+  .verified-badge {
+    background: rgba(16,185,129,0.15);
+    border: 1px solid #10b981;
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 10px;
+    text-align: center;
+  }
+  .verified-badge .vb-title { font-size: 15px; color: #6bffb8; font-weight: 700; margin-bottom: 4px; }
+  .verified-badge .vb-time { font-size: 11px; color: #66aa88; }
+
+  .block-wrap { padding: 20px 10px; }
+  .block-icon { font-size: 60px; margin-bottom: 16px; }
+  .block-title { font-size: 20px; color: #ffd700; font-weight: 700; margin-bottom: 10px; }
+  .block-msg { font-size: 14px; color: #bbaacc; line-height: 1.7; margin-bottom: 16px; }
+  .block-extra {
+    font-size: 12px; color: #887799; line-height: 1.6;
+    background: rgba(0,0,0,0.3); border-radius: 10px;
+    padding: 12px; margin-top: 12px;
+  }
+
+  .rule { margin-top: 24px; font-size: 12px; color: #887799; line-height: 1.8; }
+  .rule h3 { color: #ffd700; font-size: 14px; margin-bottom: 6px; }
+
+  .modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.78);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 99; padding: 16px;
+  }
+  .modal-card {
+    background: #2d1b3d; border: 2px solid #ffd700; border-radius: 20px;
+    padding: 28px 22px; max-width: 320px; width: 100%; text-align: center;
+    max-height: 88vh; overflow-y: auto;
+  }
+  .result-img {
+    font-size: 60px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 70px;
+  }
+  .result-img img { max-width: 100%; max-height: 180px; border-radius: 10px; }
+  .modal-card h2 { font-size: 22px; color: #ffd700; margin-bottom: 8px; }
+  .modal-card p { font-size: 14px; color: #bbaacc; margin-bottom: 18px; line-height: 1.6; }
+  .result-tip { font-size: 11px; color: #887799; margin-top: 10px; }
+  .pwd-input {
+    width: 100%; background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,215,0,0.4);
+    border-radius: 10px; color: #fff; padding: 12px;
+    font-size: 16px; text-align: center;
+    margin-bottom: 12px; font-family: inherit;
+  }
+  .modal-card .btn { margin-top: 8px; }
+
+  .toast {
+    position: fixed; bottom: 40px; left: 50%;
+    -webkit-transform: translateX(-50%);
+    transform: translateX(-50%);
+    background: #333; color: #fff; padding: 10px 18px;
+    border-radius: 30px; font-size: 13px; z-index: 999;
+    max-width: 88vw; text-align: center;
+    white-space: normal; word-break: break-all;
+  }
+  [hidden] { display: none !important; }
+
+  .admin-fab {
+    position: fixed; right: 14px; bottom: 14px;
+    width: 46px; height: 46px;
+    background: rgba(255,215,0,0.15);
+    border: 1px solid rgba(255,215,0,0.5);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; color: #ffd700;
+    z-index: 90; cursor: pointer;
+    opacity: 0.5;
+  }
+  .admin-fab:active { opacity: 1; }
+
+  .admin {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: #150f20; z-index: 200;
+    overflow-y: auto; padding: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .admin-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .admin-head h2 { font-size: 18px; color: #ffd700; }
+  .admin-head button {
+    background: rgba(255,255,255,0.12); border: none; color: #fff;
+    padding: 8px 14px; border-radius: 20px; font-size: 13px;
+    font-family: inherit;
+  }
+  .admin section {
+    background: rgba(255,255,255,0.05); border-radius: 12px;
+    padding: 12px; margin-bottom: 12px;
+    border: 1px solid rgba(255,215,0,0.18);
+  }
+  .admin h3 { font-size: 14px; color: #ffd700; margin-bottom: 8px; }
+  .admin label { display: block; font-size: 12px; color: #bbaacc; margin: 8px 0 4px; }
+  .admin input, .admin textarea, .admin select {
+    width: 100%; background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 8px; color: #fff; padding: 8px; font-size: 15px;
+    font-family: inherit;
+  }
+  .admin select { -webkit-appearance: none; appearance: none; padding: 8px; }
+  .admin input[type="file"] {
+    font-size: 12px; padding: 6px;
+    background: rgba(255,215,0,0.08);
+    border: 1px dashed rgba(255,215,0,0.4);
+  }
+  .admin input[type="color"] { padding: 2px; height: 40px; width: 100%; }
+  .admin input[type="datetime-local"] {
+    color-scheme: dark;
+    -webkit-appearance: none;
+    font-size: 14px;
+  }
+  .admin textarea { font-size: 12px; height: 100px; margin-top: 8px; }
+  .admin .btn { font-size: 15px; padding: 12px; margin-top: 8px; }
+  .admin .info-box {
+    background: rgba(255,215,0,0.08);
+    border: 1px dashed rgba(255,215,0,0.35);
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 11px;
+    color: #bbaacc;
+    line-height: 1.6;
+    margin-top: 8px;
+  }
+  .admin .info-box b { color: #ffd700; }
+
+  .switch-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 0;
+  }
+  .switch-row span { font-size: 13px; color: #ddccff; }
+  .switch {
+    position: relative;
+    width: 48px; height: 28px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 24px; height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+  .switch.on { background: #ffd700; }
+  .switch.on::after { transform: translateX(20px); }
+
+  .bg-picker-row {
+    display: flex; gap: 8px; margin-top: 6px;
+  }
+  .bg-option {
+    flex: 1;
+    text-align: center;
+    padding: 10px 4px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,215,0,0.25);
+    border-radius: 8px;
+    font-size: 11px;
+    color: #bbaacc;
+    cursor: pointer;
+  }
+  .bg-option.active {
+    background: rgba(255,215,0,0.2);
+    border-color: #ffd700;
+    color: #ffd700;
+  }
+
+  .box-edit {
+    background: rgba(0,0,0,0.3); border-radius: 10px; margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .box-head {
+    display: flex; align-items: center;
+    padding: 10px 12px; cursor: pointer;
+    background: rgba(255,215,0,0.08);
+  }
+  .box-head .bhe { font-size: 22px; margin-right: 8px; }
+  .box-head .bhn { flex: 1; font-size: 14px; color: #ffd700; font-weight: 600; }
+  .box-head .bha { font-size: 13px; color: #bbaacc; }
+  .box-edit.collapsed .box-body { display: none; }
+
+  .box-body { padding: 12px; }
+  .box-body .field-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .box-body .field-row > * { flex: 1; }
+  .box-body .field-row label { margin: 0 0 4px; font-size: 11px; }
+  .box-body > label { margin-top: 8px; }
+
+  .box-img-uploader {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-top: 6px; padding: 8px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 8px;
+  }
+  .box-img-uploader .p-img-label {
+    font-size: 11px; color: #bbaacc; flex: 0 0 auto;
+  }
+  .box-img-uploader input[type="file"] {
+    font-size: 11px; padding: 4px 6px;
+    background: rgba(255,215,0,0.08);
+    border: 1px dashed rgba(255,215,0,0.4);
+    border-radius: 6px;
+    max-width: 140px;
+    flex: 0 0 auto;
+  }
+  .box-img-preview {
+    flex: 1; min-width: 50px; display: flex; align-items: center; gap: 8px;
+  }
+  .box-img-preview img {
+    max-width: 60px; max-height: 60px; border-radius: 4px;
+    border: 1px solid rgba(255,215,0,0.3);
+  }
+  .box-img-preview .no-img { font-size: 10px; color: #665577; }
+  .box-img-clear {
+    background: rgba(255,80,80,0.15); border: 1px solid #ff5050; color: #ff5050;
+    border-radius: 6px; padding: 4px 8px; font-size: 10px;
+    cursor: pointer; flex: 0 0 auto;
+    font-family: inherit;
+  }
+
+  .prize-row {
+    background: rgba(255,255,255,0.05); border-radius: 8px;
+    padding: 10px; margin-bottom: 8px;
+  }
+  .prize-row .pr-r1 { display: flex; gap: 6px; margin-bottom: 6px; }
+  .prize-row .pr-r1 input:first-child { width: 44px; text-align: center; }
+  .prize-row .pr-r2 {
+    display: flex; gap: 6px; align-items: center;
+    font-size: 11px; color: #bbaacc; flex-wrap: wrap; margin-bottom: 6px;
+  }
+  .prize-row .pr-r2 input { width: 60px; padding: 5px; font-size: 15px; }
+  .prize-row .pr-r2 .prob { color: #ffd700; min-width: 50px; }
+  .prize-row .pr-r3 { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .prize-row .pr-r3 input { flex: 1; }
+  .prize-row .del {
+    background: rgba(255,80,80,0.15); border: 1px solid #ff5050; color: #ff5050;
+    border-radius: 8px; padding: 4px 10px; font-size: 11px;
+    cursor: pointer; width: auto;
+    font-family: inherit;
+  }
+  .prize-row .pr-r4 {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    margin-top: 6px; padding-top: 8px;
+    border-top: 1px dashed rgba(255,215,0,0.15);
+  }
+  .prize-row .pr-r4 .p-img-label {
+    font-size: 11px; color: #bbaacc; flex: 0 0 auto;
+  }
+  .prize-row .p-img-file {
+    font-size: 11px; padding: 4px 6px;
+    background: rgba(255,215,0,0.08);
+    border: 1px dashed rgba(255,215,0,0.4);
+    border-radius: 6px; color: #bbaacc;
+    max-width: 120px; flex: 0 0 auto;
+  }
+  .prize-row .p-img-preview {
+    flex: 1; min-width: 50px; display: flex; align-items: center;
+  }
+  .prize-row .p-img-preview img {
+    max-width: 60px; max-height: 60px; border-radius: 4px;
+    border: 1px solid rgba(255,215,0,0.3);
+  }
+  .prize-row .p-img-preview .no-img { font-size: 10px; color: #665577; }
+  .prize-row .p-img-clear {
+    background: rgba(255,80,80,0.15); border: 1px solid #ff5050; color: #ff5050;
+    border-radius: 6px; padding: 4px 8px; font-size: 10px;
+    cursor: pointer; flex: 0 0 auto;
+    font-family: inherit;
+  }
+
+  .rec-item {
+    font-size: 12px; color: #ccbbdd; padding: 9px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08); line-height: 1.6;
+  }
+  .rec-item b { color: #ffd700; }
+  .rec-item .ri-row { display: flex; justify-content: space-between; align-items: center; }
+  .rec-item .ri-status {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 10px;
+  }
+  .rec-item .ri-status.yes { background: rgba(16,185,129,0.2); color: #6bffb8; }
+  .rec-item .ri-status.no  { background: rgba(255,159,67,0.2); color: #ff9f43; }
+  .rec-item .ri-btn {
+    background: rgba(255,215,0,0.15); border: 1px solid #ffd700; color: #ffd700;
+    padding: 3px 10px; border-radius: 10px; font-size: 10px; cursor: pointer;
+    margin-top: 4px;
+    font-family: inherit;
+  }
+  .rec-item .ri-btn.undo { border-color: #ff5050; color: #ff5050; background: rgba(255,80,80,0.1); }
+  .empty { color: #665577; font-size: 12px; text-align: center; padding: 12px 0; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hero">
+    <h1 id="heroTitle">拆盲盒 · 赢好礼</h1>
+    <p id="heroSubtitle">添加销售微信，即可参与抽奖</p>
+  </div>
+
+  <div class="stage">
+    <div class="steps" id="stepsBar">
+      <div class="step active" data-step="1"><i>1</i><span>添加销售</span></div>
+      <div class="step" data-step="2"><i>2</i><span>选择盲盒</span></div>
+    </div>
+
+    <div class="panel" id="panel-1">
+      <div class="qr-wrap" id="qrWrap">
+        <img id="salesQR" alt="销售微信二维码" style="display:none">
+        <div id="qrFallback" style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1a1025;padding:10px">
+          <div style="font-size:12px;color:#666;margin-bottom:6px">请到微信搜索添加</div>
+          <div style="font-size:22px;font-weight:900;color:#1a1025;word-break:break-all;text-align:center" id="qrFallbackId">sales_test</div>
+        </div>
+      </div>
+      <p class="hint">扫码或长按识别添加销售微信</p>
+      <div class="copy-row">
+        <span>微信号：<b id="salesIdDisplay">sales_test</b></span>
+        <button class="btn-mini" id="copyBtn">复制</button>
+      </div>
+
+      <div id="salesCodeArea" hidden>
+        <div class="code-input-wrap">
+          <input class="code-input" id="salesCodeInput" placeholder="请输入销售提供的口令" autocomplete="off">
+        </div>
+        <p class="code-tip">请向销售索取口令后输入</p>
+      </div>
+
+      <button class="btn" id="goStep2Btn">我已添加，去选盲盒</button>
+    </div>
+
+    <div class="panel" id="panel-2" hidden>
+      <p class="hint">从下面挑选一个盲盒，<b>只有一次机会</b>哦~</p>
+      <div class="box-grid" id="boxGrid"></div>
+    </div>
+
+    <div class="panel" id="panel-done" hidden>
+      <div class="prize-card">
+        <div class="pc-emoji" id="doneEmoji">🎁</div>
+        <div class="pc-name" id="doneName"></div>
+        <div class="pc-desc" id="doneDesc"></div>
+        <div class="pc-box" id="doneBox"></div>
+        <div class="pc-time" id="doneTime"></div>
+      </div>
+
+      <div class="verify-area" id="verifyArea">
+        <div class="verify-slider" id="verifySlider">
+          <div class="vs-fill" id="vsFill"></div>
+          <span class="vs-label" id="vsLabel">滑动核销 →</span>
+          <div class="vs-thumb" id="vsThumb">→</div>
+        </div>
+        <p class="verify-tip">请<b>工作人员</b>滑动上方滑块完成核销</p>
+      </div>
+
+      <div class="verified-badge" id="verifiedBadge" hidden>
+        <div class="vb-title">✓ 已核销</div>
+        <div class="vb-time" id="verifiedTime"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-block" hidden>
+      <div class="block-wrap">
+        <div class="block-icon" id="blockIcon">🔒</div>
+        <div class="block-title" id="blockTitle">活动不可用</div>
+        <div class="block-msg" id="blockMsg"></div>
+        <div class="block-extra" id="blockExtra"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rule">
+    <h3>活动规则</h3>
+    <p id="ruleText"></p>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-card">
+    <div class="result-img" id="resultImg">🎁</div>
+    <h2 id="resultName"></h2>
+    <p id="resultDesc"></p>
+    <button class="btn" id="modalCloseBtn">知道了</button>
+    <p class="result-tip" id="resultTip"></p>
+  </div>
+</div>
+
+<div class="modal" id="pwdModal" hidden>
+  <div class="modal-card">
+    <h2>后台验证</h2>
+    <p>请输入后台密码</p>
+    <input class="pwd-input" id="pwdInput" type="password" placeholder="密码" autocomplete="off">
+    <button class="btn" id="pwdOkBtn">进入后台</button>
+    <button class="btn btn-sec" id="pwdCancelBtn">取消</button>
+  </div>
+</div>
+
+<div class="admin" id="admin" hidden>
+  <div class="admin-head">
+    <h2>活动后台</h2>
+    <button id="adminCloseBtn">关闭</button>
+  </div>
+
+  <section>
+    <h3>销售设置</h3>
+    <label>销售微信号</label>
+    <input id="cfgSalesId">
+    <label>销售微信二维码图片</label>
+    <input type="file" id="cfgQRFile" accept="image/*">
+    <div id="qrPreview" style="margin-top:8px;text-align:center"></div>
+    <button class="btn btn-sec" id="clearQRBtn">清除二维码图片</button>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed rgba(255,215,0,0.2)">
+      <div class="switch-row">
+        <span>强制口令验证</span>
+        <div class="switch" id="swSalesCode"></div>
+      </div>
+      <div class="info-box">
+        开启后，用户必须先输入正确口令才能抽奖。<br>
+        关闭则用户只要扫码加销售即可进入抽奖。
+      </div>
+      <label>销售口令（发给销售，由销售提供给客户）</label>
+      <input id="cfgSalesCode" placeholder="例如 VIP888" autocomplete="off">
+    </div>
+  </section>
+
+  <section>
+    <h3>页面外观</h3>
+    <label>页面标题</label>
+    <input id="cfgPageTitle" placeholder="拆盲盒 · 赢好礼">
+    <label>副标题（在标题下方）</label>
+    <input id="cfgPageSubtitle" placeholder="添加销售微信，即可参与抽奖">
+
+    <label>背景类型</label>
+    <div class="bg-picker-row">
+      <div class="bg-option" data-bg="default">默认渐变</div>
+      <div class="bg-option" data-bg="color">纯色</div>
+      <div class="bg-option" data-bg="image">图片</div>
+    </div>
+
+    <div id="bgColorArea" style="margin-top:8px" hidden>
+      <label>背景颜色</label>
+      <input type="color" id="cfgBgColor" value="#1a1025">
+    </div>
+
+    <div id="bgImageArea" style="margin-top:8px" hidden>
+      <label>背景图片（建议 1080×1920 内，不超过 1.5MB）</label>
+      <input type="file" id="cfgBgImageFile" accept="image/*">
+      <div id="bgImagePreview" style="margin-top:8px;text-align:center"></div>
+      <button class="btn btn-sec" id="clearBgImageBtn">清除背景图片</button>
+    </div>
+  </section>
+
+  <section>
+    <h3>活动时间窗口</h3>
+    <div class="info-box">
+      不填表示不限制。到了结束时间后，页面会显示"活动已结束"。
+    </div>
+    <label>开始时间（可留空）</label>
+    <input type="datetime-local" id="cfgStartTime">
+    <label>结束时间（可留空）</label>
+    <input type="datetime-local" id="cfgEndTime">
+  </section>
+
+  <section>
+    <h3>公众号链接保护</h3>
+    <div class="info-box">
+      设置"来源密钥"后，只有带这个密钥的链接才能抽奖。公众号发的链接格式：<br>
+      <b id="linkExample">https://你的域名/?source=你的密钥</b><br>
+      留空表示不限制。
+    </div>
+    <label>来源密钥</label>
+    <input id="cfgSourceKey" placeholder="例如 mp2024akd，留空则不校验">
+  </section>
+
+  <section>
+    <h3>后台密码 & 规则</h3>
+    <label>后台密码</label>
+    <input id="cfgPwd">
+    <label>活动规则文案（支持 &lt;br&gt; 换行）</label>
+    <textarea id="cfgRule"></textarea>
+    <button class="btn" id="saveBaseBtn">保存基础设置</button>
+  </section>
+
+  <section>
+    <h3>盲盒设置</h3>
+    <p style="font-size:11px;color:#887799;margin-bottom:8px">
+      每个盲盒可以设颜色或上传照片。有照片时以照片为底，没照片用颜色渐变。
+    </p>
+    <div id="boxesEditor"></div>
+    <button class="btn btn-sec" id="addBoxBtn">+ 添加盲盒</button>
+    <button class="btn" id="saveBoxesBtn">保存盲盒配置</button>
+  </section>
+
+  <section>
+    <h3>参与者名单（<span id="recCount">0</span> 人，已核销 <span id="recVerified">0</span>）</h3>
+    <div id="recordList"></div>
+    <button class="btn" id="exportExcelBtn">📥 下载 Excel 名单</button>
+    <button class="btn btn-sec" id="exportCSVBtn">复制为 CSV（备用）</button>
+    <button class="btn btn-danger" id="clearRecBtn">清空所有记录</button>
+    <textarea id="csvOut" readonly placeholder="备用文本区：若下载失败，可点 CSV 按钮后长按这里复制"></textarea>
+  </section>
+
+  <section>
+    <h3>本机测试</h3>
+    <p style="font-size:11px;color:#887799;margin-bottom:8px">
+      当前设备指纹：<br><b id="myDeviceId" style="color:#ffd700;font-size:10px"></b>
+    </p>
+    <button class="btn btn-sec" id="resetMeBtn">重置本机抽奖状态</button>
+  </section>
+</div>
+
+<div class="admin-fab" id="adminFab">⚙️</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function() {
+  'use strict';
+
+  /* ================= 后端地址 ================= */
+  var API_BASE = 'https://before.githubpage.com';
+
+  /* ================= 默认配置 ================= */
+  function defaultPrizes() {
+    return [
+      { name: '一等奖', emoji: '🏆', weight: 1,  stock: 1,   desc: '恭喜获得一等奖！', image: '' },
+      { name: '二等奖', emoji: '🥈', weight: 5,  stock: 5,   desc: '恭喜获得二等奖！', image: '' },
+      { name: '三等奖', emoji: '🥉', weight: 15, stock: 20,  desc: '恭喜获得三等奖！', image: '' },
+      { name: '谢谢参与', emoji: '😢', weight: 79, stock: 999, desc: '很遗憾，这次没中奖，再接再厉！', image: '' }
+    ];
+  }
+  var DEFAULT_CFG = {
+    salesId: 'sales_test',
+    salesQRImage: '',
+    salesCodeEnabled: false,
+    salesCode: '',
+    password: 'akd123456',
+    rule: '1. 添加销售微信后可参与抽奖。<br>2. 每人限选一个盲盒，限抽一次。<br>3. 中奖后请截图联系销售领取。',
+    startTime: '',
+    endTime: '',
+    sourceKey: '',
+    pageTitle: '拆盲盒 · 赢好礼',
+    pageSubtitle: '添加销售微信，即可参与抽奖',
+    pageBgType: 'default',
+    pageBgColor: '#1a1025',
+    pageBgImage: '',
+    boxes: [
+      { name: '1号盲盒', emoji: '🎁', color: '#ff6b6b', image: '', prizes: defaultPrizes() },
+      { name: '2号盲盒', emoji: '🎀', color: '#4ecdc4', image: '', prizes: defaultPrizes() },
+      { name: '3号盲盒', emoji: '🎊', color: '#ffd93d', image: '', prizes: defaultPrizes() },
+      { name: '4号盲盒', emoji: '🎉', color: '#a29bfe', image: '', prizes: defaultPrizes() },
+      { name: '5号盲盒', emoji: '🎈', color: '#ff9f43', image: '', prizes: defaultPrizes() },
+      { name: '6号盲盒', emoji: '🧧', color: '#ff6b81', image: '', prizes: defaultPrizes() }
+    ]
+  };
+
+  var KEY_CFG = 'lottery_cfg_v8';
+  var KEY_REC = 'lottery_rec_v8';
+  var KEY_ME  = 'lottery_me_v8';
+
+  /* ================= 设备指纹 ================= */
+  function getDeviceId() {
+    try {
+      var raw = [
+        navigator.userAgent || '',
+        navigator.language || '',
+        navigator.platform || '',
+        screen.width + 'x' + screen.height,
+        screen.colorDepth || '',
+        new Date().getTimezoneOffset(),
+        navigator.hardwareConcurrency || '',
+        navigator.maxTouchPoints || ''
+      ].join('|');
+      var hash = 0;
+      for (var i = 0; i < raw.length; i++) {
+        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+        hash |= 0;
+      }
+      return 'D' + Math.abs(hash).toString(36).toUpperCase();
+    } catch (e) {
+      return 'D' + Math.random().toString(36).slice(2, 10).toUpperCase();
+    }
+  }
+  var DEVICE_ID = getDeviceId();
+
+  /* ================= 存储 ================= */
+  function loadCfg() {
+    try {
+      var s = localStorage.getItem(KEY_CFG);
+      if (s) {
+        var o = JSON.parse(s);
+        return {
+          salesId: o.salesId || DEFAULT_CFG.salesId,
+          salesQRImage: o.salesQRImage || '',
+          salesCodeEnabled: !!o.salesCodeEnabled,
+          salesCode: o.salesCode || '',
+          password: o.password || DEFAULT_CFG.password,
+          rule: o.rule || DEFAULT_CFG.rule,
+          startTime: o.startTime || '',
+          endTime: o.endTime || '',
+          sourceKey: o.sourceKey || '',
+          pageTitle: o.pageTitle || DEFAULT_CFG.pageTitle,
+          pageSubtitle: o.pageSubtitle || DEFAULT_CFG.pageSubtitle,
+          pageBgType: o.pageBgType || 'default',
+          pageBgColor: o.pageBgColor || '#1a1025',
+          pageBgImage: o.pageBgImage || '',
+          boxes: (o.boxes && o.boxes.length) ? o.boxes : JSON.parse(JSON.stringify(DEFAULT_CFG.boxes))
+        };
+      }
+    } catch (e) {}
+    return JSON.parse(JSON.stringify(DEFAULT_CFG));
+  }
+  function saveCfg(c) {
+    try {
+      localStorage.setItem(KEY_CFG, JSON.stringify(c));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  function loadRec() {
+    try { return JSON.parse(localStorage.getItem(KEY_REC) || '[]'); }
+    catch (e) { return []; }
+  }
+  function saveRec(r) {
+    try { localStorage.setItem(KEY_REC, JSON.stringify(r)); } catch (e) {}
+  }
+  function loadMe() {
+    try { return JSON.parse(localStorage.getItem(KEY_ME) || 'null'); }
+    catch (e) { return null; }
+  }
+  function saveMe(m) {
+    try { localStorage.setItem(KEY_ME, JSON.stringify(m)); } catch (e) {}
+  }
+
+  /* ================= 全局 ================= */
+  var CFG = loadCfg();
+  var ME  = loadMe();
+  var step = 1;
+  var drawing = false;
+  var sliderReady = false;
+  var salesCodeVerified = false;
+
+  /* ================= 工具 ================= */
+  function $(id) { return document.getElementById(id); }
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function showToast(msg) {
+    var t = $('toast');
+    t.textContent = msg;
+    t.hidden = false;
+    if (t._timer) clearTimeout(t._timer);
+    t._timer = setTimeout(function() { t.hidden = true; }, 1800);
+  }
+
+  function setPanel(id) {
+    var ids = ['panel-1', 'panel-2', 'panel-done', 'panel-block'];
+    for (var i = 0; i < ids.length; i++) {
+      $(ids[i]).hidden = (ids[i] !== id);
+    }
+  }
+
+  function renderPrizeVisual(el, prize) {
+    if (prize && prize.image) {
+      el.innerHTML = '<img src="' + prize.image + '" alt="">';
+    } else {
+      el.textContent = (prize && prize.emoji) || '🎁';
+    }
+  }
+
+  /* ================= URL 参数解析 ================= */
+  function getQueryParam(name) {
+    try {
+      var search = window.location.search || '';
+      if (search.charAt(0) === '?') search = search.substring(1);
+      if (!search) return null;
+      var parts = search.split('&');
+      for (var i = 0; i < parts.length; i++) {
+        var kv = parts[i].split('=');
+        if (decodeURIComponent(kv[0]) === name) {
+          return kv.length > 1 ? decodeURIComponent(kv[1]) : '';
+        }
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  /* ================= 时间 ================= */
+  function parseLocalDateTime(str) {
+    if (!str) return null;
+    str = String(str).trim();
+    if (!str) return null;
+    var parts = str.split('T');
+    if (parts.length !== 2) return null;
+    var d = parts[0].split('-');
+    var t = parts[1].split(':');
+    if (d.length !== 3 || t.length < 2) return null;
+    var ms = new Date(
+      Number(d[0]), Number(d[1]) - 1, Number(d[2]),
+      Number(t[0]), Number(t[1]), 0
+    ).getTime();
+    return isNaN(ms) ? null : ms;
+  }
+
+  function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+  function formatDateTime(ms) {
+    var d = new Date(ms);
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) +
+      ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+
+  /* ================= 检查 ================= */
+  function checkSource() {
+    if (!CFG.sourceKey) return { ok: true };
+    var src = getQueryParam('source');
+    if (src === CFG.sourceKey) return { ok: true };
+    return {
+      ok: false,
+      icon: '🔒',
+      title: '请通过公众号获取链接',
+      msg: '本活动仅限公众号用户参与，个人分享的链接无效。',
+      extra: '打开公众号 → 发送关键词【抽奖】 → 点击自动回复中的链接即可参与。'
+    };
+  }
+
+  function checkTimeWindow() {
+    var now = Date.now();
+    var start = parseLocalDateTime(CFG.startTime);
+    var end = parseLocalDateTime(CFG.endTime);
+
+    if (start && now < start) {
+      var diff = start - now;
+      var hours = Math.floor(diff / 3600000);
+      var mins = Math.floor((diff % 3600000) / 60000);
+      var msg = '距活动开始还有 ';
+      if (hours > 0) msg += hours + ' 小时 ';
+      msg += mins + ' 分钟';
+      return {
+        ok: false,
+        icon: '⏰',
+        title: '活动尚未开始',
+        msg: msg,
+        extra: '开始时间：' + formatDateTime(start)
+      };
+    }
+    if (end && now > end) {
+      return {
+        ok: false,
+        icon: '⏳',
+        title: '活动已结束',
+        msg: '本次活动已于 ' + formatDateTime(end) + ' 结束。',
+        extra: '感谢您的参与，敬请期待下次活动。'
+      };
+    }
+    return { ok: true };
+  }
+
+  function showBlock(info) {
+    $('stepsBar').hidden = true;
+    $('blockIcon').textContent = info.icon || '🔒';
+    $('blockTitle').textContent = info.title || '活动不可用';
+    $('blockMsg').textContent = info.msg || '';
+    $('blockExtra').textContent = info.extra || '';
+    $('blockExtra').style.display = info.extra ? 'block' : 'none';
+    setPanel('panel-block');
+  }
+
+  /* ================= 应用页面外观 ================= */
+  function applyPageAppearance() {
+    $('heroTitle').textContent = CFG.pageTitle || DEFAULT_CFG.pageTitle;
+    $('heroSubtitle').textContent = CFG.pageSubtitle || DEFAULT_CFG.pageSubtitle;
+
+    var body = document.body;
+    if (CFG.pageBgType === 'color' && CFG.pageBgColor) {
+      body.style.background = CFG.pageBgColor;
+      body.style.backgroundAttachment = 'fixed';
+    } else if (CFG.pageBgType === 'image' && CFG.pageBgImage) {
+      body.style.background = '#1a1025';
+      body.style.backgroundImage = 'url(' + CFG.pageBgImage + ')';
+      body.style.backgroundSize = 'cover';
+      body.style.backgroundPosition = 'center top';
+      body.style.backgroundRepeat = 'no-repeat';
+      body.style.backgroundAttachment = 'fixed';
+    } else {
+      body.style.background = '';
+      body.style.backgroundImage = '';
+      body.style.backgroundSize = '';
+      body.style.backgroundPosition = '';
+      body.style.backgroundRepeat = '';
+      body.style.backgroundAttachment = 'fixed';
+    }
+  }
+
+  /* ================= 渲染销售二维码 ================= */
+  function renderSalesQR() {
+    var img = $('salesQR');
+    var fallback = $('qrFallback');
+    var fallbackId = $('qrFallbackId');
+    fallbackId.textContent = CFG.salesId || '';
+    if (CFG.salesQRImage) {
+      img.src = CFG.salesQRImage;
+      img.style.display = 'block';
+      fallback.style.display = 'none';
+    } else {
+      img.style.display = 'none';
+      fallback.style.display = 'flex';
+    }
+
+    if (CFG.salesCodeEnabled) {
+      $('salesCodeArea').hidden = false;
+    } else {
+      $('salesCodeArea').hidden = true;
+    }
+  }
+
+  function renderQRPreview() {
+    var box = $('qrPreview');
+    if (CFG.salesQRImage) {
+      box.innerHTML =
+        '<img src="' + CFG.salesQRImage + '" ' +
+        'style="max-width:120px;border-radius:8px;border:1px solid rgba(255,215,0,0.4)">' +
+        '<div style="font-size:11px;color:#887799;margin-top:4px">当前二维码</div>';
+    } else {
+      box.innerHTML = '<div style="font-size:11px;color:#887799">未上传，前端将显示微信号</div>';
+    }
+  }
+
+  /* ================= 初始化 ================= */
+  function findMyRecord() {
+    var rec = loadRec();
+    for (var i = 0; i < rec.length; i++) {
+      if (rec[i].deviceId === DEVICE_ID) return rec[i];
+    }
+    return null;
+  }
+
+  function renderBoxGrid() {
+    var grid = $('boxGrid');
+    grid.innerHTML = '';
+    for (var i = 0; i < CFG.boxes.length; i++) {
+      (function(idx) {
+        var box = CFG.boxes[idx];
+        var wrap = document.createElement('div');
+        wrap.className = 'box-item';
+
+        var inner = document.createElement('div');
+        inner.className = 'box-inner';
+
+        if (box.image) {
+          inner.style.backgroundImage = 'url(' + box.image + ')';
+          inner.style.backgroundSize = 'cover';
+          inner.style.backgroundPosition = 'center';
+          inner.className += ' has-image';
+        } else {
+          inner.style.background = 'linear-gradient(160deg, ' + (box.color || '#ff6b6b') + ' 0%, #1a1025 130%)';
+        }
+
+        var content = document.createElement('div');
+        content.className = 'bi-content';
+        content.innerHTML =
+          '<div class="bi-emoji">' + esc(box.emoji || '🎁') + '</div>' +
+          '<div class="bi-label">' + esc(box.name || '盲盒') + '</div>';
+
+        inner.appendChild(content);
+        wrap.appendChild(inner);
+        wrap.onclick = function() { selectBox(idx, wrap); };
+        grid.appendChild(wrap);
+      })(i);
+    }
+  }
+
+  function init() {
+    applyPageAppearance();
+    $('salesIdDisplay').textContent = CFG.salesId;
+    $('ruleText').innerHTML = CFG.rule;
+    $('myDeviceId').textContent = DEVICE_ID;
+
+    bindEvents();
+
+    var srcCheck = checkSource();
+    if (!srcCheck.ok) {
+      showBlock(srcCheck);
+      return;
+    }
+
+    var timeCheck = checkTimeWindow();
+    if (!timeCheck.ok) {
+      showBlock(timeCheck);
+      return;
+    }
+
+    if (!ME) {
+      var rec = findMyRecord();
+      if (rec) {
+        ME = {
+          deviceId: DEVICE_ID,
+          boxIndex: rec.boxIndex,
+          boxName: rec.box,
+          prize: {
+            name: rec.prize,
+            emoji: rec.emoji,
+            desc: rec.desc,
+            image: rec.image || ''
+          },
+          time: rec.time,
+          verified: !!rec.verified,
+          verifiedTime: rec.verifiedTime || null
+        };
+        saveMe(ME);
+      }
+    }
+
+    if (ME) {
+      $('stepsBar').hidden = true;
+      renderDonePage();
+      setPanel('panel-done');
+    } else {
+      setPanel('panel-1');
+    }
+
+    // 从后端拉配置，再渲染盲盒和二维码
+    fetch(API_BASE + '/config')
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        if (data.ok && data.config && data.config.boxes && data.config.boxes.length) {
+          CFG.boxes = data.config.boxes;
+        }
+        renderBoxGrid();
+        renderSalesQR();
+      })
+      .catch(function() {
+        renderBoxGrid();
+        renderSalesQR();
+      });
+  }
+
+  /* ================= 事件绑定 ================= */
+  function bindEvents() {
+    $('goStep2Btn').onclick = onGoStep2Click;
+    $('copyBtn').onclick = copySalesId;
+    $('modalCloseBtn').onclick = function() { $('modal').hidden = true; };
+
+    $('adminFab').onclick = openPwd;
+    $('pwdOkBtn').onclick = tryOpenAdmin;
+    $('pwdCancelBtn').onclick = function() { $('pwdModal').hidden = true; };
+    $('adminCloseBtn').onclick = closeAdmin;
+
+    $('cfgQRFile').onchange = onQRFileChange;
+    $('clearQRBtn').onclick = clearQR;
+
+    $('swSalesCode').onclick = toggleSalesCodeSwitch;
+
+    var bgOpts = document.querySelectorAll('.bg-option');
+    for (var i = 0; i < bgOpts.length; i++) {
+      bgOpts[i].onclick = onBgOptionClick;
+    }
+
+    $('cfgBgImageFile').onchange = onBgImageChange;
+    $('clearBgImageBtn').onclick = clearBgImage;
+
+    $('saveBaseBtn').onclick = saveBaseConfig;
+    $('addBoxBtn').onclick = addBox;
+    $('saveBoxesBtn').onclick = saveBoxesConfig;
+    $('exportExcelBtn').onclick = exportExcel;
+    $('exportCSVBtn').onclick = exportCSV;
+    $('clearRecBtn').onclick = clearRecords;
+    $('resetMeBtn').onclick = resetMe;
+  }
+
+  /* ================= 步骤1 → 步骤2 ================= */
+  function onGoStep2Click() {
+    if (CFG.salesCodeEnabled && !salesCodeVerified) {
+      var code = ($('salesCodeInput').value || '').trim();
+      if (!code) {
+        showToast('请输入销售提供的口令');
+        return;
+      }
+      if (code !== CFG.salesCode) {
+        showToast('口令不正确，请向销售确认');
+        return;
+      }
+      salesCodeVerified = true;
+      showToast('口令正确，可以抽奖啦');
+    }
+    goStep(2);
+  }
+
+  function goStep(n) {
+    step = n;
+    setPanel('panel-' + n);
+    var steps = document.querySelectorAll('.step');
+    for (var i = 0; i < steps.length; i++) {
+      if (i + 1 <= n) steps[i].className = 'step active';
+      else steps[i].className = 'step';
+    }
+  }
+
+  /* ================= 复制微信号 ================= */
+  function copySalesId() {
+    var text = CFG.salesId;
+
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, 9999);
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta);
+      showToast(ok ? '已复制微信号' : '复制失败，请长按选择');
+    }
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function() {
+        showToast('已复制微信号');
+      })['catch'](fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  /* ================= 抽奖（接后端） ================= */
+  function selectBox(idx, el) {
+    if (drawing || ME) return;
+    if (step < 2) return;
+
+    var tc = checkTimeWindow();
+    if (!tc.ok) {
+      showBlock(tc);
+      return;
+    }
+
+    drawing = true;
+
+    var items = document.querySelectorAll('.box-item');
+    for (var i = 0; i < items.length; i++) {
+      items[i].style.pointerEvents = 'none';
+    }
+    el.classList.add('shaking');
+
+    setTimeout(function() {
+      el.classList.remove('shaking');
+      doOpenBox(idx);
+    }, 900);
+  }
+
+  function doOpenBox(idx) {
+    var box = CFG.boxes[idx];
+
+    var overlay = document.createElement('div');
+    overlay.className = 'open-overlay';
+    var boxEl = document.createElement('div');
+    boxEl.className = 'open-box';
+
+    if (box.image) {
+      boxEl.style.backgroundImage = 'url(' + box.image + ')';
+      boxEl.style.backgroundSize = 'cover';
+      boxEl.style.backgroundPosition = 'center';
+      boxEl.style.color = 'transparent';
+    } else {
+      boxEl.style.background = 'linear-gradient(160deg, ' + (box.color || '#ff6b6b') + ' 0%, #1a1025 130%)';
+      boxEl.textContent = box.emoji || '🎁';
+    }
+
+    overlay.appendChild(boxEl);
+    document.body.appendChild(overlay);
+
+    fetch(API_BASE + '/draw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fingerprint: DEVICE_ID, boxIndex: idx })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (!data.ok) {
+        if (overlay.parentNode) document.body.removeChild(overlay);
+        drawing = false;
+        var items = document.querySelectorAll('.box-item');
+        for (var i = 0; i < items.length; i++) items[i].style.pointerEvents = '';
+        showToast(data.msg || '抽奖失败');
+        return;
+      }
+
+      var prize = data.prize;
+
+      setTimeout(function() {
+        boxEl.className = 'open-box opened';
+        boxEl.style.backgroundImage = '';
+        boxEl.style.color = '';
+        boxEl.style.background = 'linear-gradient(160deg, ' + (box.color || '#ff6b6b') + ' 0%, #1a1025 130%)';
+
+        if (prize.image) {
+          boxEl.innerHTML = '<img src="' + prize.image + '" alt="">';
+        } else {
+          boxEl.textContent = prize.emoji || '🎁';
+        }
+
+        var time = new Date().toLocaleString('zh-CN');
+
+        ME = {
+          deviceId: DEVICE_ID,
+          boxIndex: idx,
+          boxName: box.name,
+          prize: {
+            name: prize.name,
+            emoji: prize.emoji || '🎁',
+            desc: prize.desc || '',
+            image: prize.image || ''
+          },
+          time: time,
+          verified: false,
+          verifiedTime: null
+        };
+        saveMe(ME);
+
+        setTimeout(function() {
+          if (overlay.parentNode) document.body.removeChild(overlay);
+          showResult(prize);
+          $('stepsBar').hidden = true;
+          renderDonePage();
+          setPanel('panel-done');
+        }, 700);
+      }, 1100);
+    })
+    .catch(function() {
+      if (overlay.parentNode) document.body.removeChild(overlay);
+      drawing = false;
+      var items = document.querySelectorAll('.box-item');
+      for (var i = 0; i < items.length; i++) items[i].style.pointerEvents = '';
+      showToast('网络错误，请重试');
+    });
+  }
+
+  /* ================= 我的奖品页 ================= */
+  function renderDonePage() {
+    if (!ME) return;
+
+    renderPrizeVisual($('doneEmoji'), ME.prize);
+    $('doneName').textContent = (ME.prize && ME.prize.name) || '';
+    $('doneDesc').textContent = (ME.prize && ME.prize.desc) || '';
+    $('doneBox').textContent = ME.boxName ? ('盲盒：' + ME.boxName) : '';
+    $('doneTime').textContent = ME.time ? ('中奖时间：' + ME.time) : '';
+
+    var isLose = ME.prize && /谢谢|未中奖/.test(ME.prize.name || '');
+    var area = $('verifyArea');
+    var badge = $('verifiedBadge');
+
+    if (isLose) {
+      area.hidden = true;
+      badge.hidden = true;
+    } else if (ME.verified) {
+      area.hidden = true;
+      badge.hidden = false;
+      $('verifiedTime').textContent = '核销时间：' + (ME.verifiedTime || '');
+    } else {
+      area.hidden = false;
+      badge.hidden = true;
+      sliderReady = false;
+      setTimeout(setupVerifySlider, 60);
+    }
+  }
+
+  /* ================= 滑动核销 ================= */
+  function setupVerifySlider() {
+    if (sliderReady) return;
+    var container = $('verifySlider');
+    if (!container || container.offsetWidth === 0) return;
+    sliderReady = true;
+
+    var thumb = $('vsThumb');
+    var fill = $('vsFill');
+    var label = $('vsLabel');
+
+    thumb.style.transform = 'translateX(0)';
+    thumb.style.webkitTransform = 'translateX(0)';
+    thumb.textContent = '→';
+    thumb.className = 'vs-thumb';
+    fill.style.width = '52px';
+    label.style.opacity = '1';
+
+    var maxX = 0;
+    var startX = 0;
+    var currentX = 0;
+    var dragging = false;
+    var done = false;
+
+    function updateMax() {
+      maxX = container.offsetWidth - thumb.offsetWidth - 8;
+      if (maxX < 10) maxX = 10;
+    }
+    function setX(x) {
+      if (x < 0) x = 0;
+      if (x > maxX) x = maxX;
+      currentX = x;
+      var t = 'translateX(' + x + 'px)';
+      thumb.style.transform = t;
+      thumb.style.webkitTransform = t;
+      var ratio = maxX ? x / maxX : 0;
+      fill.style.width = (thumb.offsetWidth + x) + 'px';
+      label.style.opacity = String(Math.max(0, 1 - ratio * 2.2));
+    }
+    function getCx(e) {
+      if (e.touches && e.touches.length) return e.touches[0].clientX;
+      if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+      return e.clientX;
+    }
+    function onDown(e) {
+      if (done) return;
+      dragging = true;
+      updateMax();
+      startX = getCx(e) - currentX;
+    }
+    function onMove(e) {
+      if (!dragging || done) return;
+      setX(getCx(e) - startX);
+      if (e.cancelable) e.preventDefault();
+    }
+    function onUp() {
+      if (!dragging || done) return;
+      dragging = false;
+      if (currentX >= maxX * 0.85) {
+        done = true;
+        setX(maxX);
+        thumb.className = 'vs-thumb done';
+        thumb.textContent = '✓';
+        label.style.opacity = '0';
+        setTimeout(doVerify, 200);
+      } else {
+        setX(0);
+      }
+    }
+
+    container.addEventListener('touchstart', onDown, { passive: true });
+    container.addEventListener('touchmove', onMove, { passive: false });
+    container.addEventListener('touchend', onUp);
+    container.addEventListener('mousedown', onDown);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }
+
+  function doVerify() {
+    if (!ME) return;
+    var time = new Date().toLocaleString('zh-CN');
+    ME.verified = true;
+    ME.verifiedTime = time;
+    saveMe(ME);
+
+    var rec = loadRec();
+    for (var i = 0; i < rec.length; i++) {
+      if (rec[i].deviceId === DEVICE_ID) {
+        rec[i].verified = true;
+        rec[i].verifiedTime = time;
+        break;
+      }
+    }
+    saveRec(rec);
+
+    renderDonePage();
+    showToast('核销成功');
+  }
+
+  /* ================= 结果弹窗 ================= */
+  function showResult(prize) {
+    renderPrizeVisual($('resultImg'), prize);
+    $('resultName').textContent = prize.name || '';
+    $('resultDesc').textContent = prize.desc || '';
+    var name = prize.name || '';
+    var lose = /谢谢|未中奖/.test(name);
+    $('resultTip').textContent = lose ? '' : '请到销售处凭此页核销领取奖品';
+    $('modal').hidden = false;
+  }
+
+  /* ================= 后台入口 ================= */
+  function openPwd() {
+    $('pwdInput').value = '';
+    $('pwdModal').hidden = false;
+    setTimeout(function() { $('pwdInput').focus(); }, 100);
+  }
+
+  function tryOpenAdmin() {
+    var val = ($('pwdInput').value || '').trim();
+    if (val === CFG.password) {
+      $('pwdModal').hidden = true;
+      openAdmin();
+    } else {
+      showToast('密码错误');
+    }
+  }
+
+  function openAdmin() {
+    $('cfgSalesId').value = CFG.salesId;
+    $('cfgSalesCode').value = CFG.salesCode || '';
+    $('cfgPwd').value = CFG.password;
+    $('cfgRule').value = CFG.rule;
+    $('cfgStartTime').value = CFG.startTime || '';
+    $('cfgEndTime').value = CFG.endTime || '';
+    $('cfgSourceKey').value = CFG.sourceKey || '';
+    $('cfgPageTitle').value = CFG.pageTitle || '';
+    $('cfgPageSubtitle').value = CFG.pageSubtitle || '';
+    $('cfgBgColor').value = CFG.pageBgColor || '#1a1025';
+
+    var sw = $('swSalesCode');
+    if (CFG.salesCodeEnabled) sw.className = 'switch on';
+    else sw.className = 'switch';
+
+    var bgType = CFG.pageBgType || 'default';
+    var opts = document.querySelectorAll('.bg-option');
+    for (var i = 0; i < opts.length; i++) {
+      if (opts[i].getAttribute('data-bg') === bgType) opts[i].className = 'bg-option active';
+      else opts[i].className = 'bg-option';
+    }
+    updateBgAreaVisibility();
+
+    updateLinkExample();
+    renderBoxesEditor();
+    renderRecords();
+    renderQRPreview();
+    renderBgImagePreview();
+    $('myDeviceId').textContent = DEVICE_ID;
+    $('admin').hidden = false;
+  }
+
+  function updateLinkExample() {
+    var key = ($('cfgSourceKey').value || '').trim() || '你的密钥';
+    var origin = window.location.origin || 'https://你的域名';
+    var path = window.location.pathname || '/';
+    var url = origin + path + '?source=' + encodeURIComponent(key);
+    $('linkExample').textContent = url;
+  }
+
+  function closeAdmin() {
+    $('admin').hidden = true;
+    $('salesIdDisplay').textContent = CFG.salesId;
+    $('ruleText').innerHTML = CFG.rule;
+    applyPageAppearance();
+    renderBoxGrid();
+    renderSalesQR();
+  }
+
+  function toggleSalesCodeSwitch() {
+    var sw = $('swSalesCode');
+    if (sw.className.indexOf('on') >= 0) {
+      sw.className = 'switch';
+      CFG.salesCodeEnabled = false;
+    } else {
+      sw.className = 'switch on';
+      CFG.salesCodeEnabled = true;
+    }
+  }
+
+  function onBgOptionClick() {
+    var type = this.getAttribute('data-bg');
+    var opts = document.querySelectorAll('.bg-option');
+    for (var i = 0; i < opts.length; i++) {
+      if (opts[i] === this) opts[i].className = 'bg-option active';
+      else opts[i].className = 'bg-option';
+    }
+    CFG.pageBgType = type;
+    updateBgAreaVisibility();
+  }
+
+  function updateBgAreaVisibility() {
+    $('bgColorArea').hidden = (CFG.pageBgType !== 'color');
+    $('bgImageArea').hidden = (CFG.pageBgType !== 'image');
+  }
+
+  function renderBgImagePreview() {
+    var box = $('bgImagePreview');
+    if (CFG.pageBgImage) {
+      box.innerHTML =
+        '<img src="' + CFG.pageBgImage + '" ' +
+        'style="max-width:100%;max-height:160px;border-radius:8px;border:1px solid rgba(255,215,0,0.3)">' +
+        '<div style="font-size:11px;color:#887799;margin-top:4px">当前背景图</div>';
+    } else {
+      box.innerHTML = '<div style="font-size:11px;color:#887799">未上传</div>';
+    }
+  }
+
+  function onBgImageChange(e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.type.indexOf('image/') !== 0) { showToast('请选择图片'); return; }
+    if (file.size > 1.5 * 1024 * 1024) { showToast('图片不要超过 1.5MB'); return; }
+
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      CFG.pageBgImage = ev.target.result;
+      renderBgImagePreview();
+      showToast('已选择，记得点保存基础设置');
+    };
+    reader.onerror = function() { showToast('读取图片失败'); };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  function clearBgImage() {
+    if (!confirm('确定清除背景图？')) return;
+    CFG.pageBgImage = '';
+    renderBgImagePreview();
+    showToast('已清除，记得保存');
+  }
+
+  function saveBaseConfig() {
+    CFG.salesId  = ($('cfgSalesId').value || '').trim() || DEFAULT_CFG.salesId;
+    CFG.salesCode = ($('cfgSalesCode').value || '').trim();
+    CFG.password = ($('cfgPwd').value || '').trim() || DEFAULT_CFG.password;
+    CFG.rule     = ($('cfgRule').value || '').trim() || DEFAULT_CFG.rule;
+    CFG.startTime = ($('cfgStartTime').value || '').trim();
+    CFG.endTime   = ($('cfgEndTime').value || '').trim();
+    CFG.sourceKey = ($('cfgSourceKey').value || '').trim();
+    CFG.pageTitle = ($('cfgPageTitle').value || '').trim() || DEFAULT_CFG.pageTitle;
+    CFG.pageSubtitle = ($('cfgPageSubtitle').value || '').trim() || DEFAULT_CFG.pageSubtitle;
+    CFG.pageBgColor = $('cfgBgColor').value || '#1a1025';
+
+    var s = parseLocalDateTime(CFG.startTime);
+    var e = parseLocalDateTime(CFG.endTime);
+    if (s && e && s >= e) {
+      showToast('开始时间必须早于结束时间');
+      return;
+    }
+
+    if (CFG.salesCodeEnabled && !CFG.salesCode) {
+      showToast('已开启口令，请填写口令内容');
+      return;
+    }
+
+    if (!saveCfg(CFG)) {
+      showToast('存储已满，请减少图片');
+      return;
+    }
+    applyPageAppearance();
+    renderSalesQR();
+    updateLinkExample();
+    showToast('基础设置已保存');
+  }
+
+  function onQRFileChange(e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    if (file.type.indexOf('image/') !== 0) { showToast('请选择图片'); return; }
+    if (file.size > 500 * 1024) { showToast('图片不要超过 500KB'); return; }
+
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      CFG.salesQRImage = ev.target.result;
+      if (!saveCfg(CFG)) {
+        showToast('存储已满，图片未保存');
+        CFG = loadCfg();
+        return;
+      }
+      renderQRPreview();
+      renderSalesQR();
+      showToast('二维码已上传');
+    };
+    reader.onerror = function() { showToast('读取图片失败'); };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  }
+
+  function clearQR() {
+    if (!confirm('确定清除已上传的二维码图片？')) return;
+    CFG.salesQRImage = '';
+    saveCfg(CFG);
+    renderQRPreview();
+    renderSalesQR();
+    showToast('已清除');
+  }
+
+  /* ================= 盲盒编辑 ================= */
+  function renderBoxesEditor() {
+    var wrap = $('boxesEditor');
+    wrap.innerHTML = '';
+
+    for (var bi = 0; bi < CFG.boxes.length; bi++) {
+      (function(box) {
+        var el = document.createElement('div');
+        el.className = 'box-edit collapsed';
+
+        var head = document.createElement('div');
+        head.className = 'box-head';
+        head.innerHTML =
+          '<span class="bhe">' + esc(box.emoji || '🎁') + '</span>' +
+          '<span class="bhn">' + esc(box.name || '盲盒') + '</span>' +
+          '<span class="bha">▼</span>';
+        head.onclick = function() {
+          if (el.className.indexOf('collapsed') >= 0) {
+            el.className = 'box-edit';
+          } else {
+            el.className = 'box-edit collapsed';
+          }
+        };
+        el.appendChild(head);
+
+        var body = document.createElement('div');
+        body.className = 'box-body';
+        body.innerHTML =
+          '<div class="field-row">' +
+            '<div><label>盲盒名称</label><input class="be-name" value="' + esc(box.name || '') + '"></div>' +
+            '<div><label>图标 emoji</label><input class="be-emoji" value="' + esc(box.emoji || '🎁') + '"></div>' +
+          '</div>' +
+          '<div class="field-row">' +
+            '<div><label>盒子颜色（无图片时生效）</label><input type="color" class="be-color" value="' + esc(box.color || '#ff6b6b') + '"></div>' +
+          '</div>' +
+          '<div class="box-img-uploader">' +
+            '<span class="p-img-label">盒子照片</span>' +
+            '<input type="file" class="be-image-file" accept="image/*">' +
+            '<div class="box-img-preview"></div>' +
+            '<button class="box-img-clear" type="button">清除</button>' +
+          '</div>' +
+          '<label style="margin-top:12px">奖品列表</label>' +
+          '<div class="prize-list"></div>' +
+          '<button class="btn btn-sec add-prize-btn" type="button">+ 添加奖品</button>' +
+          '<button class="btn btn-danger remove-box-btn" type="button">删除此盲盒</button>';
+        el.appendChild(body);
+        wrap.appendChild(el);
+
+        var previewBox = body.querySelector('.box-img-preview');
+        function renderBoxImgPreview() {
+          var img = el.getAttribute('data-image') || '';
+          if (img) {
+            previewBox.innerHTML = '<img src="' + img + '" alt="">';
+          } else {
+            previewBox.innerHTML = '<span class="no-img">未上传</span>';
+          }
+        }
+        el.setAttribute('data-image', box.image || '');
+        renderBoxImgPreview();
+
+        body.querySelector('.be-image-file').onchange = function(e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          if (file.type.indexOf('image/') !== 0) { showToast('请选择图片'); return; }
+          if (file.size > 300 * 1024) { showToast('单张不超过 300KB'); return; }
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            el.setAttribute('data-image', ev.target.result);
+            renderBoxImgPreview();
+            showToast('图片已选择，记得保存');
+          };
+          reader.onerror = function() { showToast('读取失败'); };
+          reader.readAsDataURL(file);
+          e.target.value = '';
+        };
+
+        body.querySelector('.box-img-clear').onclick = function() {
+          el.setAttribute('data-image', '');
+          renderBoxImgPreview();
+          showToast('已清除盒子图片');
+        };
+
+        var prizeListEl = body.querySelector('.prize-list');
+        renderPrizeList(prizeListEl, box.prizes || []);
+
+        body.querySelector('.add-prize-btn').onclick = function() {
+          var prizes = collectPrizesFromDOM(prizeListEl);
+          prizes.push({ name: '新奖品', emoji: '🎁', weight: 10, stock: 10, desc: '恭喜中奖！', image: '' });
+          renderPrizeList(prizeListEl, prizes);
+        };
+
+        body.querySelector('.remove-box-btn').onclick = function() {
+          if (CFG.boxes.length <= 1) { showToast('至少保留一个盲盒'); return; }
+          if (!confirm('确定删除此盲盒？')) return;
+          var wrapEl = $('boxesEditor');
+          var boxes = collectBoxesFromDOM(wrapEl);
+          var boxEls = wrapEl.querySelectorAll('.box-edit');
+          var idx = -1;
+          for (var i = 0; i < boxEls.length; i++) {
+            if (boxEls[i] === el) { idx = i; break; }
+          }
+          if (idx >= 0) boxes.splice(idx, 1);
+          CFG.boxes = boxes;
+          renderBoxesEditor();
+        };
+      })(CFG.boxes[bi]);
+    }
+  }
+
+  function renderPrizeList(wrap, prizes) {
+    wrap.innerHTML = '';
+    var total = 0;
+    for (var i = 0; i < prizes.length; i++) {
+      total += (Number(prizes[i].weight) || 0);
+    }
+    if (total <= 0) total = 1;
+
+    for (var pi = 0; pi < prizes.length; pi++) {
+      (function(p) {
+        var row = document.createElement('div');
+        row.className = 'prize-row';
+        row.setAttribute('data-image', p.image || '');
+        row.innerHTML =
+          '<div class="pr-r1">' +
+            '<input class="p-emoji" value="' + esc(p.emoji || '🎁') + '">' +
+            '<input class="p-name" value="' + esc(p.name || '') + '">' +
+          '</div>' +
+          '<div class="pr-r2">' +
+            '<span>权重</span><input type="number" class="p-weight" value="' + (p.weight || 0) + '">' +
+            '<span>库存</span><input type="number" class="p-stock" value="' + (p.stock || 0) + '">' +
+            '<span class="prob">' + ((Number(p.weight) || 0) / total * 100).toFixed(1) + '%</span>' +
+            '<button class="del" type="button">删除</button>' +
+          '</div>' +
+          '<div class="pr-r3">' +
+            '<input class="p-desc" value="' + esc(p.desc || '') + '" placeholder="中奖描述">' +
+          '</div>' +
+          '<div class="pr-r4">' +
+            '<span class="p-img-label">图片</span>' +
+            '<input type="file" class="p-img-file" accept="image/*">' +
+            '<div class="p-img-preview"></div>' +
+            '<button class="p-img-clear" type="button">清除</button>' +
+          '</div>';
+        wrap.appendChild(row);
+
+        renderPrizeImgPreview(row);
+
+        row.querySelector('.p-weight').oninput = function() {
+          updateProbDisplay(wrap);
+        };
+
+        row.querySelector('.del').onclick = function() {
+          row.parentNode.removeChild(row);
+          updateProbDisplay(wrap);
+        };
+
+        row.querySelector('.p-img-file').onchange = function(e) {
+          var file = e.target.files && e.target.files[0];
+          if (!file) return;
+          if (file.type.indexOf('image/') !== 0) { showToast('请选择图片'); return; }
+          if (file.size > 300 * 1024) { showToast('单张不超过 300KB'); return; }
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            row.setAttribute('data-image', ev.target.result);
+            renderPrizeImgPreview(row);
+            showToast('图片已选择，记得保存');
+          };
+          reader.onerror = function() { showToast('读取失败'); };
+          reader.readAsDataURL(file);
+          e.target.value = '';
+        };
+
+        row.querySelector('.p-img-clear').onclick = function() {
+          row.setAttribute('data-image', '');
+          renderPrizeImgPreview(row);
+          showToast('已清除图片');
+        };
+      })(prizes[pi]);
+    }
+  }
+
+  function renderPrizeImgPreview(row) {
+    var box = row.querySelector('.p-img-preview');
+    var img = row.getAttribute('data-image');
+    if (img) {
+      box.innerHTML = '<img src="' + img + '" alt="">';
+    } else {
+      box.innerHTML = '<span class="no-img">未上传</span>';
+    }
+  }
+
+  function updateProbDisplay(wrap) {
+    var rows = wrap.querySelectorAll('.prize-row');
+    var total = 0;
+    for (var i = 0; i < rows.length; i++) {
+      total += (Number(rows[i].querySelector('.p-weight').value) || 0);
+    }
+    if (total <= 0) total = 1;
+    for (var i = 0; i < rows.length; i++) {
+      var w = Number(rows[i].querySelector('.p-weight').value) || 0;
+      rows[i].querySelector('.prob').textContent = (w / total * 100).toFixed(1) + '%';
+    }
+  }
+
+  function addBox() {
+    var wrap = $('boxesEditor');
+    CFG.boxes = collectBoxesFromDOM(wrap);
+    CFG.boxes.push({
+      name: '新盲盒', emoji: '🎁', color: '#a29bfe', image: '',
+      prizes: [{ name: '奖品', emoji: '🎁', weight: 1, stock: 1, desc: '恭喜中奖！', image: '' }]
+    });
+    renderBoxesEditor();
+  }
+
+  function collectBoxesFromDOM(wrap) {
+    var boxes = [];
+    var boxEls = wrap.querySelectorAll('.box-edit');
+    for (var i = 0; i < boxEls.length; i++) {
+      var el = boxEls[i];
+      var name  = (el.querySelector('.be-name').value || '').trim() || '盲盒';
+      var emoji = (el.querySelector('.be-emoji').value || '').trim() || '🎁';
+      var color = el.querySelector('.be-color').value || '#ff6b6b';
+      var image = el.getAttribute('data-image') || '';
+      var prizes = collectPrizesFromDOM(el.querySelector('.prize-list'));
+      if (!prizes.length) {
+        prizes = [{ name: '谢谢参与', emoji: '😢', weight: 1, stock: 999, desc: '', image: '' }];
+      }
+      boxes.push({ name: name, emoji: emoji, color: color, image: image, prizes: prizes });
+    }
+    return boxes;
+  }
+
+  function collectPrizesFromDOM(wrap) {
+    var prizes = [];
+    var rows = wrap.querySelectorAll('.prize-row');
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      prizes.push({
+        emoji: (row.querySelector('.p-emoji').value || '').trim() || '🎁',
+        name:  (row.querySelector('.p-name').value  || '').trim() || '奖品',
+        weight: Number(row.querySelector('.p-weight').value) || 0,
+        stock:  Number(row.querySelector('.p-stock').value)  || 0,
+        desc:  (row.querySelector('.p-desc').value || '').trim(),
+        image: row.getAttribute('data-image') || ''
+      });
+    }
+    return prizes;
+  }
+
+  function saveBoxesConfig() {
+    var wrap = $('boxesEditor');
+    var boxes = collectBoxesFromDOM(wrap);
+    if (!boxes.length) { showToast('至少保留一个盲盒'); return; }
+    CFG.boxes = boxes;
+    if (!saveCfg(CFG)) {
+      showToast('存储已满，请减少图片');
+      return;
+    }
+    renderBoxesEditor();
+    showToast('盲盒配置已保存');
+  }
+ 
+  /* ================= 名单 ================= */
+  function renderRecords() {
+    fetch(API_BASE + '/records')
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
+        var rec = data.records || [];
+        var verifiedCount = 0;
+        for (var i = 0; i < rec.length; i++) {
+          if (rec[i].verified) verifiedCount++;
+        }
+        $('recCount').textContent = rec.length;
+        $('recVerified').textContent = verifiedCount;
+
+        var wrap = $('recordList');
+        if (!rec.length) {
+          wrap.innerHTML = '<div class="empty">暂无参与记录</div>';
+          return;
+        }
+
+        var html = '';
+        for (var i = 0; i < rec.length; i++) {
+          (function(r) {
+            var statusHtml = r.verified
+              ? '<span class="ri-status yes">已核销</span>'
+              : '<span class="ri-status no">未核销</span>';
+            var btnText = r.verified ? '取消核销' : '手动核销';
+            var btnClass = r.verified ? 'ri-btn undo' : 'ri-btn';
+            html += '<div class="rec-item">' +
+              '<div class="ri-row"><span>#' + r.id + ' · ' + esc(r.time) + '</span>' + statusHtml + '</div>' +
+              '<div><b>' + esc(r.prize) + '</b> · ' + esc(r.box || '') + '</div>' +
+              '<div style="font-size:10px;color:#776688">设备：' + esc((r.fingerprint || '').slice(0, 12)) + '...' +
+                (r.verified_time ? ' · 核销于 ' + esc(r.verified_time) : '') + '</div>' +
+              '<button class="' + btnClass + '" data-id="' + r.id + '" data-verified="' + (r.verified ? '1' : '0') + '" type="button">' + btnText + '</button>' +
+            '</div>';
+          })(rec[i]);
+        }
+        wrap.innerHTML = html;
+
+        var btns = wrap.querySelectorAll('.ri-btn');
+        for (var i = 0; i < btns.length; i++) {
+          btns[i].onclick = function() {
+            var id = this.getAttribute('data-id');
+            var verified = this.getAttribute('data-verified') === '1';
+            toggleVerify(id, !verified);
+          };
+        }
+      })
+      .catch(function() {
+        $('recordList').innerHTML = '<div class="empty">加载失败，请检查网络</div>';
+      });
+  }
+
+  function toggleVerify(id, verified) {
+    var time = verified ? new Date().toLocaleString('zh-CN') : null;
+    fetch(API_BASE + '/records', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id, verified: verified, verified_time: time })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.ok) {
+        renderRecords();
+        showToast(verified ? '已核销' : '已取消核销');
+      } else {
+        showToast('操作失败');
+      }
+    })
+    .catch(function() {
+      showToast('网络错误');
+    });
+  }
+
+  /* ================= 导出 Excel ================= */
+  function exportExcel() {
+    var rec = loadRec();
+    if (!rec.length) { showToast('暂无记录'); return; }
+
+    var html =
+      '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+      'xmlns:x="urn:schemas-microsoft-com:office:excel" ' +
+      'xmlns="http://www.w3.org/TR/REC-html40">' +
+      '<head><meta charset="UTF-8">' +
+      '<style>' +
+      'td,th{padding:6px 12px;border:1px solid #ccc;font-size:13px}' +
+      'th{background:#ffd700;color:#1a1025;font-weight:bold}' +
+      '</style></head><body><table>';
+    html += '<tr>' +
+      '<th>序号</th><th>设备指纹</th><th>参与时间</th>' +
+      '<th>盲盒</th><th>奖品</th><th>核销状态</th><th>核销时间</th>' +
+      '</tr>';
+    for (var i = 0; i < rec.length; i++) {
+      var r = rec[i];
+      html += '<tr>' +
+        '<td>' + (i + 1) + '</td>' +
+        '<td>' + (r.deviceId || '') + '</td>' +
+        '<td>' + (r.time || '') + '</td>' +
+        '<td>' + (r.box || '') + '</td>' +
+        '<td>' + (r.prize || '') + '</td>' +
+        '<td>' + (r.verified ? '已核销' : '未核销') + '</td>' +
+        '<td>' + (r.verifiedTime || '') + '</td>' +
+      '</tr>';
+    }
+    html += '</table></body></html>';
+
+    var filename = '抽奖名单_' + new Date().toISOString().slice(0, 10) + '.xls';
+
+    try {
+      var blob = new Blob(['\ufeff' + html], {
+        type: 'application/vnd.ms-excel;charset=utf-8'
+      });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        if (a.parentNode) document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 1000);
+      showToast('已触发下载：' + filename);
+    } catch (e) {
+      showToast('当前环境不支持下载，已切到 CSV');
+      exportCSV();
+    }
+  }
+
+  function exportCSV() {
+    var rec = loadRec();
+    if (!rec.length) { showToast('暂无记录'); return; }
+    var rows = [['序号', '设备指纹', '时间', '盲盒', '奖品', '核销状态', '核销时间']];
+    for (var i = 0; i < rec.length; i++) {
+      var r = rec[i];
+      rows.push([
+        i + 1, r.deviceId || '', r.time || '', r.box || '',
+        r.prize || '', r.verified ? '已核销' : '未核销', r.verifiedTime || ''
+      ]);
+    }
+    var lines = [];
+    for (var i = 0; i < rows.length; i++) {
+      var cells = [];
+      for (var j = 0; j < rows[i].length; j++) {
+        cells.push('"' + String(rows[i][j]).replace(/"/g, '""') + '"');
+      }
+      lines.push(cells.join(','));
+    }
+    var csv = lines.join('\n');
+
+    var ta = $('csvOut');
+    ta.value = csv;
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(csv).then(function() {
+        showToast('CSV 已复制');
+      })['catch'](function() {
+        showToast('已生成，请长按下方文本复制');
+      });
+    } else {
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, 99999);
+      var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      showToast(ok ? 'CSV 已复制' : '已生成，请长按文本复制');
+    }
+  }
+
+  function clearRecords() {
+    if (!confirm('确定清空所有记录？不可恢复。会同时清空云端数据。')) return;
+    fetch(API_BASE + '/records', {
+      method: 'DELETE'
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+      if (data.ok) {
+        saveRec([]);
+        renderRecords();
+        $('csvOut').value = '';
+        showToast('已清空云端和本地记录');
+      } else {
+        showToast('清空失败：' + (data.error || '未知错误'));
+      }
+    })
+    .catch(function() {
+      showToast('网络错误，清空失败');
+    });
+  }
+
+  function resetMe() {
+    if (!confirm('重置后本机可再抽一次，仅用于测试。确定？')) return;
+    try { localStorage.removeItem(KEY_ME); } catch (e) {}
+    var rec = loadRec();
+    var filtered = [];
+    for (var i = 0; i < rec.length; i++) {
+      if (rec[i].deviceId !== DEVICE_ID) filtered.push(rec[i]);
+    }
+    saveRec(filtered);
+
+    ME = null;
+    drawing = false;
+    step = 1;
+    sliderReady = false;
+    salesCodeVerified = false;
+    $('stepsBar').hidden = false;
+    var steps = document.querySelectorAll('.step');
+    for (var i = 0; i < steps.length; i++) {
+      steps[i].className = (i === 0) ? 'step active' : 'step';
+    }
+    setPanel('panel-1');
+    $('salesCodeInput').value = '';
+    closeAdmin();
+    showToast('已重置');
+  }
+
+  /* ================= 启动 ================= */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+</script>
+</body>
+</html>
