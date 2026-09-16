@@ -71,8 +71,9 @@ export async function onRequest(context) {
     salesQRImage: body.salesQRImage,
     rule: body.rule
   },
-  updated_at: new Date().toISOString()
-})
+      updated_at: new Date().toISOString()
+    }
+  });
 
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
