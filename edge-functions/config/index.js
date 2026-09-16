@@ -14,7 +14,6 @@ export async function onRequest(context) {
   const url = env.SUPABASE_URL;
   const key = env.SUPABASE_KEY;
 
-  // 环境变量缺失时直接报错，不掩盖问题
   if (!url || !key) {
     return new Response(JSON.stringify({
       error: '环境变量未配置',
@@ -62,23 +61,29 @@ export async function onRequest(context) {
       await fetch(url + '/rest/v1/config?id=eq.main', {
         method: 'PATCH',
         headers,
-      body: JSON.stringify({
-  data: {
-    totalUsers: body.totalUsers,
-    prizes: body.prizes,
-    boxes: body.boxes || [],
-    salesId: body.salesId,
-    salesQRImage: body.salesQRImage,
-    rule: body.rule
-  },
-      updated_at: new Date().toISOString()
+        body: JSON.stringify({
+          data: {
+            totalUsers: body.totalUsers,
+            prizes: body.prizes,
+            boxes: body.boxes || [],
+            salesId: body.salesId,
+            salesQRImage: body.salesQRImage,
+            rule: body.rule
+          },
+          updated_at: new Date().toISOString()
+        })
+      });
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, 'content-type': 'application/json' }
+      });
     }
-  });
 
+    // 其他方法
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       status: 405,
       headers: { ...corsHeaders, 'content-type': 'application/json' }
     });
+
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {
       status: 500,
