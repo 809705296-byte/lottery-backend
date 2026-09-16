@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 
-const sql = neon(postgresql://postgres.cdninpnoxkxwbckrnufu:[akd123456]@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres);
+const sql = neon(postgresql://postgres.cdninpnoxkxwbckrnufu:[cnG9hjc36d2Y2XQQ]@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres);
 
 export default async function handler(req, res) {
   // 允许跨域（前端在不同域名调用）
