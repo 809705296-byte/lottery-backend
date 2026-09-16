@@ -6,7 +6,7 @@ export async function onRequest(context) {
       status: 204,
       headers: {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, PATCH, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, PATCH, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type'
       }
     });
@@ -42,6 +42,17 @@ export async function onRequest(context) {
         method: 'PATCH',
         headers,
         body: JSON.stringify({ verified: verified, verified_time: verified_time })
+      });
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { 'content-type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      });
+    }
+
+    if (request.method === 'DELETE') {
+      // 删除所有记录：用 id 大于 0 的条件匹配所有行
+      await fetch(url + '/rest/v1/records?id=gt.0', {
+        method: 'DELETE',
+        headers
       });
       return new Response(JSON.stringify({ ok: true }), {
         headers: { 'content-type': 'application/json', 'Access-Control-Allow-Origin': '*' }
