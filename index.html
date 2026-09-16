@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>拆盲盒 · 赢好礼</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
@@ -141,32 +141,6 @@
   .prize-card .pc-name { font-size: 20px; color: #ffd700; font-weight: 700; margin-bottom: 6px; }
   .prize-card .pc-desc { font-size: 13px; color: #bbaacc; margin-bottom: 10px; }
   .prize-card .pc-time { font-size: 12px; color: #887799; }
-  .prize-card .pc-code {
-    margin-top: 14px; padding-top: 12px;
-    border-top: 1px dashed rgba(255,215,0,0.25);
-    font-size: 12px; color: #bbaacc;
-  }
-  .prize-card .pc-code b {
-    display: block; margin-top: 4px;
-    font-size: 26px; letter-spacing: 6px; color: #ffd700;
-    font-weight: 800; font-family: ui-monospace, Menlo, Consolas, monospace;
-  }
-  .admin .warn {
-    background: rgba(255,159,67,0.12);
-    border: 1px dashed rgba(255,159,67,0.5);
-    border-radius: 8px; padding: 10px;
-    font-size: 11px; color: #ffbf80; line-height: 1.7; margin-bottom: 8px;
-  }
-  .admin .warn b { color: #ffd700; }
-  .rec-filter { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
-  .rec-filter input { flex: 1; }
-  .rec-filter .btn-mini { margin-left: 0; flex: 0 0 auto; }
-  .rec-item .ri-code {
-    font-family: ui-monospace, Menlo, Consolas, monospace;
-    color: #ffd700; letter-spacing: 2px;
-  }
-  .rec-item .ri-btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-  .rec-item .ri-btn.mark { border-color: #10b981; color: #6bffb8; background: rgba(16,185,129,0.12); }
   .verify-area { margin-top: 10px; }
   .verify-slider {
     position: relative; height: 52px;
@@ -401,7 +375,6 @@
         <div class="pc-name" id="doneName"></div>
         <div class="pc-desc" id="doneDesc"></div>
         <div class="pc-time" id="doneTime"></div>
-        <div class="pc-code" id="doneCodeWrap" hidden>核销码（请出示给工作人员核对）<b id="doneCode"></b></div>
       </div>
       <div class="verify-area" id="verifyArea">
         <div class="verify-slider" id="verifySlider">
@@ -409,7 +382,7 @@
           <span class="vs-label" id="vsLabel">滑动核销 →</span>
           <div class="vs-thumb" id="vsThumb">→</div>
         </div>
-        <p class="verify-tip">请<b>工作人员</b>核对上方核销码，确认无误后滑动滑块完成核销</p>
+        <p class="verify-tip">请<b>工作人员</b>滑动上方滑块完成核销</p>
       </div>
       <div class="verified-badge" id="verifiedBadge" hidden>
         <div class="vb-title">✓ 已核销</div>
@@ -461,10 +434,6 @@
 
   <section>
     <h3>基础设置</h3>
-    <div class="warn">
-      ⚠️ 这一栏<b>只保存在当前这台设备</b>（本机预览用），不会同步给参与者。<br>
-      正式发布前请点最下面的「复制配置代码」，把生成的代码粘到网页源码里的 <b>DEFAULTS</b> 中，否则参与者看到的仍是默认值。
-    </div>
     <label>销售微信号</label>
     <input id="cfgSalesId">
     <label>销售微信二维码图片</label>
@@ -476,37 +445,26 @@
     <label>活动规则文案（支持 &lt;br&gt; 换行）</label>
     <textarea id="cfgRule"></textarea>
     <button class="btn" id="saveBaseBtn">保存基础设置</button>
-    <button class="btn btn-sec" id="copyCfgCodeBtn">复制配置代码（发布用）</button>
   </section>
 
   <section>
     <h3>奖品配置（全局共用）</h3>
     <div class="info-box">
       填写你计划的<b>预计参与人数</b>和每个奖品的<b>发放数量</b>，系统自动算出中奖概率。<br>
-      6个盲盒共用这一套奖品池，用户选哪个盒子都一样。<br>
-      没被奖品覆盖的比例会进入服务器内置的「谢谢参与」，该文案不可修改。
+      6个盲盒共用这一套奖品池，用户选哪个盒子都一样。
     </div>
     <label>预计参与人数</label>
     <input id="cfgTotalUsers" type="number" placeholder="例如 1000">
     <div id="prizeEditor" style="margin-top:8px"></div>
-    <div class="info-box" id="prizeSummary"></div>
     <button class="btn btn-sec" id="addPrizeBtn">+ 添加奖品</button>
     <button class="btn" id="savePrizesBtn">保存奖品配置</button>
   </section>
 
 <section>
   <h3>参与者名单（<span id="recCount">0</span> 人）</h3>
-  <div class="info-box">
-    服务器只记录中奖结果，<b>不会记录核销状态</b>（接口未开放）。<br>
-    请用「核销码」核对参与者页面，核对后在下方点「标记已核销」，标记会保存在本机。
-  </div>
-  <div class="rec-filter">
-    <input id="recSearch" placeholder="输入核销码 / 奖品名 筛选">
-    <button class="btn-mini" id="recSearchClear">清空</button>
-  </div>
   <div id="recordList"></div>
   <button class="btn btn-sec" id="refreshRecBtn">刷新名单</button>
-  <button class="btn" id="exportExcelBtn">📥 下载名单（CSV，Excel 可直接打开）</button>
+  <button class="btn" id="exportExcelBtn">📥 下载 Excel 名单</button>
   <button class="btn btn-sec" id="exportCSVBtn">复制为 CSV</button>
   <button class="btn btn-danger" id="clearRecBtn">清空所有记录</button>
   <textarea id="csvOut" readonly placeholder="备用文本区" style="font-size:11px;height:80px;margin-top:8px"></textarea>
@@ -528,41 +486,10 @@
 (function() {
   'use strict';
 
-  // ==================================================================
-  // ★★★ 发布前必须修改这里 ★★★
-  // 后台的「基础设置」只存在操作者自己的手机里，无法同步给参与者，
-  // 所以微信号 / 二维码 / 活动规则必须写在这里才能被所有访客看到。
-  // ==================================================================
-  var DEFAULTS = {
-    // 销售微信号：参与者第一步看到的就是它，务必改成真实微信号
-    salesId: 'sales_test',
-    // 销售微信二维码：建议填 data:image/png;base64,xxxx 形式的图片，
-    // 留空时页面会退化成「微信搜索微信号」的提示
-    salesQRImage: '',
-    // 后台密码（仅前端校验，能打开源码的人都能看到，请勿复用重要密码）
-    password: 'akd123456',
-    // 活动规则，支持 <br> 换行
-    rule: '1. 添加销售微信后可参与抽奖。<br>2. 每人限选一个盲盒，限抽一次。<br>3. 中奖后请截图联系销售领取。'
-  };
-  // ==================================================================
+  var API_BASE = 'https://before.githubpage.com';
 
-  // 接口地址改成相对路径，跟随页面自己用的协议/域名。
-  // 原来写死成 https://before.githubpage.com，只要用户是用 http 打开页面，
-  // 所有接口就变成跨域的 https 请求，证书不对时会被浏览器直接拦掉（页面看起来"网络错误"）。
-  var API_BASE = (location.protocol === 'http:' || location.protocol === 'https:')
-    ? ''
-    : 'https://before.githubpage.com';
-
-  // 设备标识模式：
-  //   'install' —— 设备特征 + 本机随机标识（推荐）
-  //   'device'  —— 只用设备特征（原版逻辑；实测同型号+同系统的手机会得到
-  //                 完全相同的标识，导致后来的同款手机被误判成「已参与过」）
-  var FP_MODE = 'install';
-
-  var KEY_ME = 'lottery_me_v9';
-  var KEY_CFG_LOCAL = 'lottery_cfg_local_v9';
-  var KEY_INSTALL = 'lottery_install_v9';
-  var KEY_REDEEMED = 'lottery_redeemed_v9';
+  var KEY_ME = 'lottery_me_v8';
+  var KEY_CFG_LOCAL = 'lottery_cfg_local_v8';
 
   function $(id) { return document.getElementById(id); }
 
@@ -587,17 +514,6 @@
     }
   }
 
-  // 本机唯一标识：随机生成后长期保存在本机，用于区分「同型号手机的不同用户」
-  function getInstallToken() {
-    var t = null;
-    try { t = localStorage.getItem(KEY_INSTALL); } catch (e) {}
-    if (!t) {
-      t = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-      try { localStorage.setItem(KEY_INSTALL, t); } catch (e) {}
-    }
-    return t;
-  }
-
   function getDeviceId() {
     try {
       var raw = [
@@ -609,7 +525,6 @@
         navigator.hardwareConcurrency || '',
         navigator.maxTouchPoints || ''
       ].join('|');
-      if (FP_MODE === 'install') raw += '|' + getInstallToken();
       var hash = 0;
       for (var i = 0; i < raw.length; i++) {
         hash = ((hash << 5) - hash) + raw.charCodeAt(i);
@@ -621,49 +536,20 @@
     }
   }
 
-  // 由设备标识推出 6 位核销码：参与者页面和后台名单算出来的是同一个值
-  function verifyCode(fp) {
-    var s = String(fp || '');
-    var h = 5381;
-    for (var i = 0; i < s.length; i++) {
-      h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
-    }
-    var c = h.toString(36).toUpperCase();
-    while (c.length < 6) { c = '0' + c; }
-    return c.slice(-6);
-  }
-
-  function loadRedeemed() {
-    try { return JSON.parse(localStorage.getItem(KEY_REDEEMED) || '{}') || {}; }
-    catch (e) { return {}; }
-  }
-  function saveRedeemed(map) {
-    try { localStorage.setItem(KEY_REDEEMED, JSON.stringify(map)); } catch (e) {}
-  }
-
   var DEVICE_ID = getDeviceId();
   var ME = null;
   var step = 1;
   var drawing = false;
   var sliderReady = false;
   var CFG = {
-    salesId: DEFAULTS.salesId,
-    salesQRImage: DEFAULTS.salesQRImage,
-    password: DEFAULTS.password,
-    rule: DEFAULTS.rule,
+    salesId: 'sales_test',
+    salesQRImage: '',
+    password: 'akd123456',
+    rule: '1. 添加销售微信后可参与抽奖。<br>2. 每人限选一个盲盒，限抽一次。<br>3. 中奖后请截图联系销售领取。',
     boxes: [],
     totalUsers: 1000,
     prizes: []
   };
-
-  // 服务器对「已参与过」只回一个奖品名，用配置里的完整信息补全
-  function findPrizeByName(name) {
-    var list = CFG.prizes || [];
-    for (var i = 0; i < list.length; i++) {
-      if (list[i] && list[i].name === name) return list[i];
-    }
-    return null;
-  }
 
   function loadMe() {
     try { return JSON.parse(localStorage.getItem(KEY_ME) || 'null'); }
@@ -752,6 +638,10 @@
     }
   }
 
+  function findMyRecord() {
+    return null;
+  }
+
   function renderDonePage() {
     if (!ME) return;
     renderPrizeVisual($('doneEmoji'), ME.prize);
@@ -762,10 +652,6 @@
     var isLose = ME.prize && /谢谢|未中奖/.test(ME.prize.name || '');
     var area = $('verifyArea');
     var badge = $('verifiedBadge');
-    var codeWrap = $('doneCodeWrap');
-
-    if (!isLose) $('doneCode').textContent = verifyCode(DEVICE_ID);
-    codeWrap.hidden = !!isLose;
 
     if (isLose) {
       area.hidden = true;
@@ -782,90 +668,72 @@
     }
   }
 
-  // 滑块状态放在外层，事件只绑定一次，
-  // 避免反复初始化时同名事件重复绑定（原版每次都会再绑一次 document 上的事件）
-  var vsBound = false;
-  var vsState = { maxX: 0, startX: 0, currentX: 0, dragging: false, done: false };
-
-  function vsMax() {
-    var container = $('verifySlider');
-    var thumb = $('vsThumb');
-    if (!container || !thumb) return 10;
-    var m = container.offsetWidth - thumb.offsetWidth - 8;
-    return m < 10 ? 10 : m;
-  }
-  function vsSetX(x) {
-    var thumb = $('vsThumb');
-    var fill = $('vsFill');
-    var label = $('vsLabel');
-    if (!thumb) return;
-    if (x < 0) x = 0;
-    if (x > vsState.maxX) x = vsState.maxX;
-    vsState.currentX = x;
-    thumb.style.transform = 'translateX(' + x + 'px)';
-    var ratio = vsState.maxX ? x / vsState.maxX : 0;
-    fill.style.width = (thumb.offsetWidth + 8 + x) + 'px';
-    label.style.opacity = String(Math.max(0, 1 - ratio * 2.2));
-  }
-  function vsCx(e) {
-    if (e.touches && e.touches.length) return e.touches[0].clientX;
-    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
-    return e.clientX;
-  }
-  function vsDown(e) {
-    if (vsState.done) return;
-    vsState.dragging = true;
-    vsState.maxX = vsMax();
-    vsState.startX = vsCx(e) - vsState.currentX;
-  }
-  function vsMove(e) {
-    if (!vsState.dragging || vsState.done) return;
-    vsSetX(vsCx(e) - vsState.startX);
-    if (e.cancelable) e.preventDefault();
-  }
-  function vsUp() {
-    if (!vsState.dragging || vsState.done) return;
-    vsState.dragging = false;
-    if (vsState.currentX >= vsState.maxX * 0.85) {
-      vsState.done = true;
-      vsSetX(vsState.maxX);
-      var thumb = $('vsThumb');
-      thumb.className = 'vs-thumb done';
-      thumb.textContent = '✓';
-      $('vsLabel').style.opacity = '0';
-      setTimeout(doVerify, 200);
-    } else {
-      vsSetX(0);
-    }
-  }
-
   function setupVerifySlider() {
     if (sliderReady) return;
     var container = $('verifySlider');
     if (!container || container.offsetWidth === 0) return;
-
-    vsState.maxX = vsMax();
-    vsState.startX = 0;
-    vsState.currentX = 0;
-    vsState.dragging = false;
-    vsState.done = false;
+    sliderReady = true;
 
     var thumb = $('vsThumb');
+    var fill = $('vsFill');
+    var label = $('vsLabel');
+
     thumb.style.transform = 'translateX(0)';
     thumb.textContent = '→';
     thumb.className = 'vs-thumb';
-    $('vsFill').style.width = (thumb.offsetWidth + 8) + 'px';
-    $('vsLabel').style.opacity = '1';
-    sliderReady = true;
+    fill.style.width = '52px';
+    label.style.opacity = '1';
 
-    if (vsBound) return;
-    vsBound = true;
-    container.addEventListener('touchstart', vsDown, { passive: true });
-    container.addEventListener('touchmove', vsMove, { passive: false });
-    container.addEventListener('touchend', vsUp);
-    container.addEventListener('mousedown', vsDown);
-    document.addEventListener('mousemove', vsMove);
-    document.addEventListener('mouseup', vsUp);
+    var maxX = 0, startX = 0, currentX = 0, dragging = false, done = false;
+
+    function updateMax() {
+      maxX = container.offsetWidth - thumb.offsetWidth - 8;
+      if (maxX < 10) maxX = 10;
+    }
+    function setX(x) {
+      if (x < 0) x = 0;
+      if (x > maxX) x = maxX;
+      currentX = x;
+      thumb.style.transform = 'translateX(' + x + 'px)';
+      var ratio = maxX ? x / maxX : 0;
+      fill.style.width = (thumb.offsetWidth + x) + 'px';
+      label.style.opacity = String(Math.max(0, 1 - ratio * 2.2));
+    }
+    function getCx(e) {
+      if (e.touches && e.touches.length) return e.touches[0].clientX;
+      if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+      return e.clientX;
+    }
+    function onDown(e) {
+      if (done) return;
+      dragging = true; updateMax();
+      startX = getCx(e) - currentX;
+    }
+    function onMove(e) {
+      if (!dragging || done) return;
+      setX(getCx(e) - startX);
+      if (e.cancelable) e.preventDefault();
+    }
+    function onUp() {
+      if (!dragging || done) return;
+      dragging = false;
+      if (currentX >= maxX * 0.85) {
+        done = true; setX(maxX);
+        thumb.className = 'vs-thumb done';
+        thumb.textContent = '✓';
+        label.style.opacity = '0';
+        setTimeout(doVerify, 200);
+      } else {
+        setX(0);
+      }
+    }
+
+    container.addEventListener('touchstart', onDown, { passive: true });
+    container.addEventListener('touchmove', onMove, { passive: false });
+    container.addEventListener('touchend', onUp);
+    container.addEventListener('mousedown', onDown);
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
   }
 
   function doVerify() {
@@ -886,54 +754,17 @@
     $('modal').hidden = false;
   }
 
-  function setBoxesEnabled(on) {
-    var items = document.querySelectorAll('.box-item');
-    for (var i = 0; i < items.length; i++) {
-      items[i].style.pointerEvents = on ? '' : 'none';
-    }
-  }
-
   function selectBox(idx, el) {
     if (drawing || ME) return;
     if (step < 2) return;
     drawing = true;
-    setBoxesEnabled(false);
+    var items = document.querySelectorAll('.box-item');
+    for (var i = 0; i < items.length; i++) items[i].style.pointerEvents = 'none';
     el.classList.add('shaking');
     setTimeout(function() {
       el.classList.remove('shaking');
       doOpenBox(idx);
     }, 900);
-  }
-
-  // 服务器说「已参与过」时，把这个人已有的中奖结果还原出来，
-  // 避免清过缓存 / 换过浏览器的用户卡死在盲盒页。
-  function recoverMyResult(prizeName) {
-    ME = {
-      prize: findPrizeByName(prizeName) || { name: prizeName, emoji: '🎁', desc: '', image: '' },
-      time: '',
-      verified: false,
-      verifiedTime: null
-    };
-    saveMe(ME);
-    $('stepsBar').hidden = true;
-    renderDonePage();
-    setPanel('panel-done');
-
-    fetch(API_BASE + '/records')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      var rec = data.records || [];
-      for (var i = 0; i < rec.length; i++) {
-        if (rec[i].fingerprint === DEVICE_ID) {
-          ME.prize = findPrizeByName(rec[i].prize) || { name: rec[i].prize, emoji: '🎁', desc: '', image: '' };
-          ME.time = rec[i].time || '';
-          saveMe(ME);
-          renderDonePage();
-          break;
-        }
-      }
-    })
-    ['catch'](function() {});
   }
 
   function doOpenBox(idx) {
@@ -948,15 +779,8 @@
     .then(function(res) { return res.json(); })
     .then(function(data) {
       if (!data.ok) {
-        setBoxesEnabled(true);
+        showToast(data.msg || '抽奖失败');
         drawing = false;
-        if (data.prize) {
-          // 该设备在服务器上已有记录（换浏览器/清缓存/同型号误判），直接展示已有结果
-          showToast(data.msg || '你已经参与过了');
-          recoverMyResult(data.prize);
-        } else {
-          showToast(data.msg || '抽奖失败，请重试');
-        }
         return;
       }
       var prize = data.prize;
@@ -996,8 +820,7 @@
       }, 1100);
     })
     ['catch'](function(err) {
-      setBoxesEnabled(true);
-      showToast('网络错误，请重试');
+      showToast('网络错误：' + err);
       drawing = false;
     });
   }
@@ -1126,26 +949,6 @@
         };
       })(i);
     }
-    renderPrizeSummary();
-  }
-
-  // 让操作者一眼看到「中奖率」和「谢谢参与」的占比（原版只显示单奖品概率）
-  function renderPrizeSummary() {
-    var box = $('prizeSummary');
-    if (!box) return;
-    var totalUsers = Number($('cfgTotalUsers').value) || CFG.totalUsers || 1000;
-    var prizes = collectPrizes();
-    var sum = 0;
-    for (var i = 0; i < prizes.length; i++) sum += Number(prizes[i].count) || 0;
-    var winPct = totalUsers > 0 ? (sum / totalUsers * 100) : 0;
-    var losePct = 100 - winPct;
-    var msg = '合计：' + prizes.length + ' 个奖品 / ' + sum + ' 份。' +
-      '<b>中奖率 ' + winPct.toFixed(2) + '%</b>，' +
-      '「谢谢参与」占比 ' + (losePct > 0 ? losePct.toFixed(2) : '0.00') + '%。';
-    if (winPct > 100) {
-      msg += '<br>⚠️ 奖品总数已经超过预计参与人数，超出部分不会被抽走。';
-    }
-    box.innerHTML = msg;
   }
 
   function renderPrizeImgPreview(row) {
@@ -1196,225 +999,126 @@
   }
 
   function saveBaseConfig() {
-  CFG.salesId = ($('cfgSalesId').value || '').trim() || DEFAULTS.salesId;
-  CFG.password = ($('cfgPwd').value || '').trim() || DEFAULTS.password;
-  CFG.rule = ($('cfgRule').value || '').trim() || DEFAULTS.rule;
-
-  // 存到服务器
-  fetch(API_BASE + '/config', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      totalUsers: CFG.totalUsers || 500,
-      prizes: CFG.prizes || [],
-      boxes: CFG.boxes || [],
-      salesId: CFG.salesId,
-      salesQRImage: CFG.salesQRImage || '',
-      rule: CFG.rule
-    })
-  })
-  .then(function(res) { return res.json(); })
-  .then(function(data) {
-    if (data.ok) {
-      showToast('基础设置已保存到服务器');
-    } else {
-      showToast('保存失败');
-    }
-  })
-  ['catch'](function() { showToast('网络错误'); });
-
-  $('salesIdDisplay').textContent = CFG.salesId;
-  renderSalesQR();
-  $('ruleText').innerHTML = CFG.rule;
-}
-
-  // 后台改完基础设置后，用这里导出可以直接粘进源码 DEFAULTS 的代码
-  function jsStr(s) {
-    return String(s == null ? '' : s)
-      .replace(/\\/g, '\\\\')
-      .replace(/'/g, "\\'")
-      .replace(/\r?\n/g, '\\n');
-  }
-
-  function buildCfgCode() {
-    return '  var DEFAULTS = {\n' +
-      "    salesId: '" + jsStr(CFG.salesId) + "',\n" +
-      "    salesQRImage: '" + jsStr(CFG.salesQRImage) + "',\n" +
-      "    password: '" + jsStr(CFG.password) + "',\n" +
-      "    rule: '" + jsStr(CFG.rule) + "'\n" +
-      '  };';
-  }
-
-  function copyCfgCode() {
-    var code = buildCfgCode();
-    $('csvOut').value = code;
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(code).then(function() {
-        showToast('已复制，粘到源码 DEFAULTS 即可');
-      })['catch'](function() {
-        showToast('已生成，请在下方文本框手动复制');
-      });
-    } else {
-      var ta = $('csvOut');
-      ta.select();
-      try { document.execCommand('copy'); showToast('已复制，粘到源码 DEFAULTS 即可'); }
-      catch (e) { showToast('已生成，请在下方文本框手动复制'); }
-    }
-  }
-
-  var RECORDS = [];
-
-  function recMatches(r, kw) {
-    if (!kw) return true;
-    var hay = [verifyCode(r.fingerprint), r.prize, r.time, r.box]
-      .join(' ').toLowerCase();
-    return hay.indexOf(kw) >= 0;
-  }
-
-  // 服务器不保存核销状态，所以核销标记存在操作者本机（同码只会在同一台设备上核对）
-  function renderRecords() {
-    var wrap = $('recordList');
-    var kw = ($('recSearch').value || '').trim().toLowerCase();
-    var redeemed = loadRedeemed();
-    var shown = [];
-    for (var i = 0; i < RECORDS.length; i++) {
-      if (recMatches(RECORDS[i], kw)) shown.push(RECORDS[i]);
-    }
-    $('recCount').textContent = RECORDS.length + (kw ? '（筛出 ' + shown.length + '）' : '');
-    if (!shown.length) {
-      wrap.innerHTML = '<div class="empty">' + (kw ? '没有匹配的记录' : '暂无记录') + '</div>';
-      return;
-    }
-    var html = '';
-    for (var j = 0; j < shown.length; j++) {
-      var r = shown[j];
-      var code = verifyCode(r.fingerprint);
-      var mark = redeemed[code];
-      var isDone = !!r.verified || !!mark;
-      html += '<div class="rec-item">' +
-        '<div class="ri-row"><span>#' + (j + 1) + ' · ' + esc(r.time) + '</span>' +
-        '<span class="ri-status ' + (isDone ? 'yes' : 'no') + '">' +
-        (isDone ? '已核销' : '未核销') + '</span></div>' +
-        '<div><b>' + esc(r.prize) + '</b>' + (r.box ? ' · ' + esc(r.box) : '') + '</div>' +
-        '<div style="font-size:11px;color:#776688">核销码 <span class="ri-code">' + code +
-        '</span> · ' + esc((r.fingerprint || '').slice(0, 10)) + '…</div>' +
-        '<div class="ri-btns">' +
-          '<button class="ri-btn ' + (isDone ? 'undo' : 'mark') +
-            '" data-code="' + code + '" data-act="' + (isDone ? 'undo' : 'mark') + '">' +
-            (isDone ? '撤销核销' : '标记已核销') + '</button>' +
-          (mark ? '<span style="font-size:10px;color:#6bffb8;align-self:center">' +
-            esc(mark) + '</span>' : '') +
-        '</div>' +
-      '</div>';
-    }
-    wrap.innerHTML = html;
-  }
-
-  function toggleRedeem(code, act) {
-    var map = loadRedeemed();
-    if (act === 'mark') {
-      map[code] = new Date().toLocaleString('zh-CN');
-    } else {
-      delete map[code];
-    }
-    saveRedeemed(map);
-    renderRecords();
+    CFG.salesId = ($('cfgSalesId').value || '').trim() || 'sales_test';
+    CFG.password = ($('cfgPwd').value || '').trim() || 'akd123456';
+    CFG.rule = ($('cfgRule').value || '').trim() || CFG.rule;
+    saveLocalCfg({ salesId: CFG.salesId, password: CFG.password, rule: CFG.rule });
+    renderSalesQR();
+    $('ruleText').innerHTML = CFG.rule;
+    showToast('基础设置已保存（本机）');
   }
 
   function loadRecordsFromServer() {
     fetch(API_BASE + '/records')
     .then(function(res) { return res.json(); })
     .then(function(data) {
-      RECORDS = data.records || [];
-      renderRecords();
+      var rec = data.records || [];
+      $('recCount').textContent = rec.length;
+      var wrap = $('recordList');
+      if (!rec.length) {
+        wrap.innerHTML = '<div class="empty">暂无记录</div>';
+        return;
+      }
+      var html = '';
+      for (var i = 0; i < rec.length; i++) {
+        var r = rec[i];
+        html += '<div class="rec-item">' +
+          '<div class="ri-row"><span>#' + (i+1) + ' · ' + esc(r.time) + '</span>' +
+          '<span class="ri-status ' + (r.verified ? 'yes' : 'no') + '">' +
+          (r.verified ? '已核销' : '未核销') + '</span></div>' +
+          '<div><b>' + esc(r.prize) + '</b></div>' +
+          '<div style="font-size:10px;color:#776688">' + esc((r.fingerprint || '').slice(0,12)) + '...</div>' +
+        '</div>';
+      }
+      wrap.innerHTML = html;
     })
     ['catch'](function() { showToast('读取名单失败'); });
   }
-  function csvField(v) {
-    var s = String(v == null ? '' : v);
-    // 防止 Excel 把 "=SUM(...)" 之类的内容当成公式执行
-    if (/^[=+\-@]/.test(s)) s = "'" + s;
-    return '"' + s.replace(/"/g, '""') + '"';
-  }
+function exportExcel() {
+  fetch(API_BASE + '/records')
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    var rec = data.records || [];
+    if (!rec.length) { showToast('暂无记录'); return; }
 
-  function buildCsv() {
-    var redeemed = loadRedeemed();
-    var rows = [['序号', '核销码', '时间', '盲盒', '奖品', '核销状态']];
-    for (var i = 0; i < RECORDS.length; i++) {
-      var r = RECORDS[i];
-      var code = verifyCode(r.fingerprint);
-      var isDone = !!r.verified || !!redeemed[code];
-      rows.push([i + 1, code, r.time || '', r.box || '', r.prize || '', isDone ? '已核销' : '未核销']);
+    var html = '<html><head><meta charset="UTF-8"><style>' +
+      'td,th{padding:6px 12px;border:1px solid #ccc;font-size:13px}' +
+      'th{background:#ffd700;color:#1a1025;font-weight:bold}' +
+      '</style></head><body><table>';
+    html += '<tr><th>序号</th><th>时间</th><th>盲盒</th><th>奖品</th><th>核销状态</th></tr>';
+    for (var i = 0; i < rec.length; i++) {
+      var r = rec[i];
+      html += '<tr>' +
+        '<td>' + (i+1) + '</td>' +
+        '<td>' + (r.time || '') + '</td>' +
+        '<td>' + (r.box || '') + '</td>' +
+        '<td>' + (r.prize || '') + '</td>' +
+        '<td>' + (r.verified ? '已核销' : '未核销') + '</td>' +
+      '</tr>';
     }
-    return rows.map(function(row) {
-      return row.map(csvField).join(',');
-    }).join('\r\n');
-  }
+    html += '</table></body></html>';
 
-  function withFreshRecords(fn) {
-    fetch(API_BASE + '/records')
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      RECORDS = data.records || [];
-      if (!RECORDS.length) { showToast('暂无记录'); return; }
-      fn();
-    })
-    ['catch'](function() { showToast('读取名单失败'); });
-  }
+    var blob = new Blob(['\ufeff' + html], { type: 'application/vnd.ms-excel;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = '抽奖名单_' + new Date().toISOString().slice(0,10) + '.xls';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function() {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 1000);
+    showToast('已触发下载');
+  });
+}
 
-  function exportExcel() {
-    withFreshRecords(function() {
-      // 直接给标准 CSV：Excel 双击即可打开，不会再弹「格式与扩展名不符」
-      var blob = new Blob(['\ufeff' + buildCsv()], { type: 'text/csv;charset=utf-8' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = '抽奖名单_' + new Date().toISOString().slice(0, 10) + '.csv';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function() {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 1000);
-      showToast('已触发下载');
-    });
-  }
+function exportCSV() {
+  fetch(API_BASE + '/records')
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    var rec = data.records || [];
+    if (!rec.length) { showToast('暂无记录'); return; }
+    var rows = [['序号','时间','盲盒','奖品','核销状态']];
+    for (var i = 0; i < rec.length; i++) {
+      var r = rec[i];
+      rows.push([i+1, r.time || '', r.box || '', r.prize || '', r.verified ? '已核销' : '未核销']);
+    }
+    var csv = rows.map(function(row) {
+      return row.map(function(f) { return '"' + String(f).replace(/"/g,'""') + '"'; }).join(',');
+    }).join('\n');
 
-  function exportCSV() {
-    withFreshRecords(function() {
-      var csv = buildCsv();
-      var ta = $('csvOut');
-      ta.value = csv;
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(csv).then(function() {
-          showToast('CSV 已复制到剪贴板');
-        })['catch'](function() {
-          showToast('已生成，请手动复制下方文本');
-        });
-      } else {
-        ta.select();
-        try { document.execCommand('copy'); showToast('已复制'); } catch (e) {
-          showToast('已生成，请手动复制下方文本');
-        }
-      }
-    });
-  }
+    var ta = $('csvOut');
+    ta.value = csv;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(csv).then(function() {
+        showToast('CSV 已复制到剪贴板');
+      })['catch'](function() {
+        showToast('已生成，请手动复制下方文本');
+      });
+    } else {
+      ta.select();
+      try { document.execCommand('copy'); showToast('已复制'); } catch(e) {}
+    }
+  });
+}
 
-  function clearRecordsFromServer() {
-    if (!confirm('确定清空服务器上的所有中奖记录？此操作不可恢复，本机的核销标记也会一起清掉。')) return;
-    fetch(API_BASE + '/records', { method: 'DELETE' })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-      if (data.ok) {
-        saveRedeemed({});
-        showToast('已清空');
-        loadRecordsFromServer();
-      } else {
-        showToast('清空失败');
-      }
-    })
-    ['catch'](function() { showToast('网络错误'); });
-  }
+function clearRecordsFromServer() {
+  if (!confirm('确定清空所有记录？不可恢复')) return;
+  fetch(API_BASE + '/records', {
+    method: 'DELETE'
+  })
+  .then(function(res) { return res.json(); })
+  .then(function(data) {
+    if (data.ok) {
+      showToast('已清空');
+      loadRecordsFromServer();
+    } else {
+      showToast('清空失败');
+    }
+  })
+  ['catch'](function() { showToast('网络错误'); });
+}
   function onQRFileChange(e) {
     var file = e.target.files && e.target.files[0];
     if (!file) return;
@@ -1451,13 +1155,10 @@
     .then(function(res) { return res.json(); })
     .then(function(data) {
       if (data.ok && data.config) {
-  CFG.totalUsers = data.config.totalUsers || 1000;
-  CFG.prizes = data.config.prizes || [];
-  CFG.boxes = data.config.boxes || [];
-  if (data.config.salesId) CFG.salesId = data.config.salesId;
-  if (data.config.salesQRImage) CFG.salesQRImage = data.config.salesQRImage;
-  if (data.config.rule) CFG.rule = data.config.rule;
-}
+        CFG.totalUsers = data.config.totalUsers || 1000;
+        CFG.prizes = data.config.prizes || [];
+      }
+    })['catch'](function() {});
 
     if (ME) {
       $('stepsBar').hidden = true;
@@ -1485,7 +1186,6 @@
       renderSalesQR();
     };
     $('saveBaseBtn').onclick = saveBaseConfig;
-    $('copyCfgCodeBtn').onclick = copyCfgCode;
     $('addPrizeBtn').onclick = function() {
       CFG.prizes = collectPrizes();
       CFG.prizes.push({ name:'新奖品', emoji:'🎁', count:10, desc:'恭喜中奖！', image:'' });
@@ -1493,20 +1193,10 @@
     };
     $('savePrizesBtn').onclick = savePrizesConfig;
     $('refreshRecBtn').onclick = loadRecordsFromServer;
-    $('exportExcelBtn').onclick = exportExcel;
-    $('exportCSVBtn').onclick = exportCSV;
-    $('clearRecBtn').onclick = clearRecordsFromServer;
-    $('recSearch').oninput = renderRecords;
-    $('recSearchClear').onclick = function() {
-      $('recSearch').value = '';
-      renderRecords();
-    };
-    $('recordList').onclick = function(e) {
-      var t = e.target;
-      if (!t || t.tagName !== 'BUTTON') return;
-      var code = t.getAttribute('data-code');
-      if (code) toggleRedeem(code, t.getAttribute('data-act'));
-    };
+   $('exportExcelBtn').onclick = exportExcel;
+$('exportCSVBtn').onclick = exportCSV;
+$('clearRecBtn').onclick = clearRecordsFromServer;
+   
     $('resetMeBtn').onclick = function() {
       if (!confirm('重置后本机可再抽一次，确定？')) return;
       localStorage.removeItem(KEY_ME);
@@ -1521,8 +1211,6 @@
       showToast('已重置');
     };
     $('cfgTotalUsers').oninput = function() {
-      // 先收下编辑框里还没保存的内容，否则重绘会把刚填的奖品清掉
-      CFG.prizes = collectPrizes();
       renderPrizeEditor();
     };
   }
